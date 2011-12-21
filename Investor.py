@@ -8,19 +8,19 @@ class BaseInvestor( object ):
         self.shares = shares
         self.history = []
 
-    def next( self, price ):
+    def next( self, stockData ):
         """Method called by the simulator on every step of the simulation"""
-        self.history.append( price )
+        self.history.append( stockData )
 
-        self.sellingStrategy( price )
-        self.buyingStrategy( price )
+        self.sellingStrategy( stockData )
+        self.buyingStrategy( stockData )
 
             
-    def buyingStrategy( self, price ):
+    def buyingStrategy( self, stockData ):
         """Override this method to create own investment strategy"""
         raise NotImplementedError( "Abstract method" )
 
-    def sellingStrategy( self, price ):
+    def sellingStrategy( self, stockData ):
         """Override this method to create own investment strategy"""
         raise NotImplementedError( "Abstract method" )
 
@@ -31,9 +31,9 @@ class BaseInvestor( object ):
         print "Buying at", price, " shares=", self.shares
 
     def sell( self, shareCount, price):
-        print "Selling at", price
         self.cash += price * shareCount
         self.shares -= shareCount
+        print "Selling at", price
 
     def getBalance( self ):
-        return self.cash + ( self.history[-1] * self.shares )
+        return self.cash + ( self.history[-1].price * self.shares )

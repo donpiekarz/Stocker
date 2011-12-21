@@ -13,7 +13,8 @@ import sys
 from time import time
 
 # local project imports 
-from InvestmentStrategies import OneShotInvestor
+from InvestmentStrategies import OneShotInvestor, RandomInvestor
+from StockData import StockData
 
 def main(argv=None):
     global options 
@@ -22,8 +23,8 @@ def main(argv=None):
 
     results = []
     
-    for i in range( 20 ):
-        inv = OneShotInvestor()
+    for i in range( 2000 ):
+        inv = RandomInvestor()
         start = 850
         end = -1
         with open( options.dataFile ) as dataFile:
@@ -35,8 +36,10 @@ def main(argv=None):
                 if line[0] == "<":
                     continue
                 name, date, openPrice, highPrice, lowPrice, closePrice, vol = line.split( "," )
+                data = StockData( name, date, openPrice, highPrice, lowPrice,
+                        closePrice, vol )
                 #print date, closePrice
-                inv.next( float( closePrice ) )
+                inv.next( data )
             results.append( inv.getBalance() )
             
 
