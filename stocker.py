@@ -19,7 +19,7 @@ def main(argv=None):
 
     results = []
     
-    for i in range( 1000 ):
+    for i in range( 20 ):
         inv = Investor()
         start = 850
         end = -1
@@ -54,16 +54,24 @@ class Investor( object ):
     def next( self, price ):
         self.history.append( price )
 
-        if ( self.shares > 0 
-                and ( price / self.lastBuyPrice ) > self.roi ):
-                print price, self.lastBuyPrice, "Sold, earned ", price / self.lastBuyPrice
-                self.sell( self.shares, price )
+        self.sellingStrategy( price )
+        self.buyingStrategy( price )
 
+            
+    def buyingStrategy( self, price ):
+        """Override this method to create own investment strategy"""
         if self.cash > price and self.shares == 0:
             #if self.isPriceGoindDown() : # if price is going down
             if random() > 0.5:
                 self.buy( int( self.cash / price ), price )
-            
+
+    def sellingStrategy( self, price ):
+        """Override this method to create own investment strategy"""
+        if ( self.shares > 0 
+                and ( price / self.lastBuyPrice ) > self.roi ):
+                print price, self.lastBuyPrice, "Sold, earned ", price / self.lastBuyPrice
+                self.sell( self.shares, price )
+        pass
 
     def isPriceGoindDown( self ):
         if len( self.history ) > 1:
