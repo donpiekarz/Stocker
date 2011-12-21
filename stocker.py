@@ -6,11 +6,14 @@ Stocker is a tool for stock exchange analysis
 __author__ = 'Mateusz Lis'
 __version__ = '0.1'
 
+# std imports 
 from optparse import OptionParser
 from random import random
 import sys
 from time import time
 
+# local project imports 
+from InvestmentStrategies import OneShotInvestor
 
 def main(argv=None):
     global options 
@@ -20,7 +23,7 @@ def main(argv=None):
     results = []
     
     for i in range( 20 ):
-        inv = Investor()
+        inv = OneShotInvestor()
         start = 850
         end = -1
         with open( options.dataFile ) as dataFile:
@@ -42,55 +45,6 @@ def main(argv=None):
     if options.verbose:
         print "Execution time", time() - startTime
     
-class Investor( object ):
-
-    def __init__( self, cash = 1000, shares = 0, returnOnInvestment = 1.05 ):
-        self.cash = cash
-        self.lastBuyPrice = -1
-        self.shares = shares
-        self.history = []
-        self.roi = returnOnInvestment
-
-    def next( self, price ):
-        self.history.append( price )
-
-        self.sellingStrategy( price )
-        self.buyingStrategy( price )
-
-            
-    def buyingStrategy( self, price ):
-        """Override this method to create own investment strategy"""
-        if self.cash > price and self.shares == 0:
-            #if self.isPriceGoindDown() : # if price is going down
-            if random() > 0.5:
-                self.buy( int( self.cash / price ), price )
-
-    def sellingStrategy( self, price ):
-        """Override this method to create own investment strategy"""
-        if ( self.shares > 0 
-                and ( price / self.lastBuyPrice ) > self.roi ):
-                print price, self.lastBuyPrice, "Sold, earned ", price / self.lastBuyPrice
-                self.sell( self.shares, price )
-        pass
-
-    def isPriceGoindDown( self ):
-        if len( self.history ) > 1:
-            return self.history[-2] > self.history[-1]
-        return False
-
-    def buy( self, shareCount, price ):
-        self.cash -= price * shareCount
-        self.shares += shareCount
-        self.lastBuyPrice = price
-        print "Buying at", price, " shares=", self.shares
-
-    def sell( self, shareCount, price):
-        print "Selling at", price
-        self.cash += price * shareCount
-        self.shares -= shareCount
-
-    def getBalance( self ):
-        return self.cash + ( self.history[-1] * self.shares )
 
 
 def parseCommandLine():
