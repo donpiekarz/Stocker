@@ -20,12 +20,11 @@ def main(argv=None):
     global options 
     options = parseCommandLine()
     startTime = time()
-
     results = []
     
     for i in range( 2000 ):
-        inv = RandomInvestor()
-        start = 850
+        inv = globals()[ options.strategy ]()
+        start = 85
         end = -1
         with open( options.dataFile ) as dataFile:
             data = dataFile.readlines()
@@ -59,6 +58,12 @@ def parseCommandLine():
     Stocker is a tool for stock exchange analysis ''')
     parser.add_option("-f", "--data", dest="dataFile", default="data.mst",
     help="File that contains stock exchange data for one company in mst format", metavar="DATAFILE")
+    parser.add_option("-s", "--strategy", dest="strategy",
+            default="OneShotInvestor",
+    help="""Investment strategy you would like to check. Currently only available
+    are: OneShotInvestor and RandomInvestor. If you have written your own
+    strategy class in InvestmentStrategies.py filed this is the place to pass
+    its name.""", metavar="DATAFILE")
     parser.add_option("-q", "--quiet",
     action="store_false", dest="verbose", default=True,
     help="don't print status messages to stdout")

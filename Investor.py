@@ -28,12 +28,12 @@ class BaseInvestor( object ):
         self.cash -= price * shareCount
         self.shares += shareCount
         self.lastBuyPrice = price
-        print "Buying at", price, " shares=", self.shares
+        #print "Buying at", price, " shares=", self.shares
 
     def sell( self, shareCount, price):
         self.cash += price * shareCount
         self.shares -= shareCount
-        print "Selling at", price
+        #print "Selling at", price
 
     def getBalance( self ):
         return self.cash + ( self.history[-1].price * self.shares )
