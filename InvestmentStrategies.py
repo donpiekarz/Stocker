@@ -51,3 +51,40 @@ class RandomInvestor( BaseInvestor ):
                 and random() > 0.5 ):
                 self.sell( self.shares, price )
 
+class MultiShotInvestor( BaseInvestor ):
+    """Base concept for this investor is the following:
+    - when it goes down, buy small packages of shares
+    - when it goes up, sell with more than given roi (return on investment)"""
+    def __init__( self, cash = 1000, shares = 0, packSize = 100, roi = 1.05 ):
+        # needs to call base class constructor
+        super( MultiShotInvestor, self ).__init__( cash, shares )
+
+        self.packagePrices = []
+        self.packageShareCounts = []
+        self.packSize = packSize
+        self.roi = roi
+
+    def buyingStrategy( self, stockData ):
+        price = stockData.price
+        if self.isPriceGoingDown() and self.cash > self.packSize:
+            if random() > 0.2:
+                if self.packSize / price:
+                    sharesToBuy = int( self.packSize / price )
+                    self.buy( sharesToBuy, price )
+                    self.packagePrices.append( price )
+                    self.packageShareCounts.append( sharesToBuy )
+    
+    def sellingStrategy( self, stockData):
+        price = stockData.price
+        for buyPriceInd in range( len( self.packagePrices ) ):
+            buyPrice = self.packagePrices[buyPriceInd] 
+            if price / buyPrice > self.roi:
+                if random() > 0.5:
+                    self.sell( self.packageShareCounts[ buyPriceInd ], price )
+                    del self.packagePrices[buyPriceInd]
+                    del self.packageShareCounts[buyPriceInd]
+                    break
+    def isPriceGoingDown( self ):
+        if len( self.history ) > 10:
+            return ( self.history[-11].price / self.history[-1].price ) > self.roi
+        return False

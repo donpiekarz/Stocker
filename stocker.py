@@ -13,7 +13,7 @@ import sys
 from time import time
 
 # local project imports 
-from InvestmentStrategies import OneShotInvestor, RandomInvestor
+from InvestmentStrategies import *
 from StockData import StockData
 
 def main(argv=None):
