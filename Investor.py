@@ -7,13 +7,21 @@ class BaseInvestor( object ):
         self.cash = cash
         self.shares = shares
         self.history = []
+        self.bought = 0
+        self.sold = 0
 
     def next( self, stockData ):
         """Method called by the simulator on every step of the simulation"""
         self.history.append( stockData )
+        self.bought = 0
+        self.sold = 0
 
         self.sellingStrategy( stockData )
         self.buyingStrategy( stockData )
+
+        stockData.bought = self.bought
+        stockData.sold = self.sold
+        return stockData
 
             
     def buyingStrategy( self, stockData ):
@@ -28,11 +36,13 @@ class BaseInvestor( object ):
         self.cash -= price * shareCount
         self.shares += shareCount
         self.lastBuyPrice = price
+        self.bought += shareCount
         #print "Buying at", price, " shares=", self.shares
 
     def sell( self, shareCount, price):
         self.cash += price * shareCount
         self.shares -= shareCount
+        self.sold += shareCount
         #print "Selling at", price
 
     def getBalance( self ):

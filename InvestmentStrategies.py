@@ -85,8 +85,11 @@ class MultiShotInvestor( BaseInvestor ):
                     del self.packageShareCounts[buyPriceInd]
                     break
     def isPriceGoingDown( self ):
-        if len( self.history ) > 10:
-            return ( self.history[-11].price / self.history[-1].price ) > self.roi
+        if len( self.packagePrices ) > 1:
+            return ( self.packagePrices[-1] / self.history[-1].price ) > self.roi
+        else:
+            if len( self.history ) > 10:
+                return ( self.history[-11].price / self.history[-1].price ) > self.roi
         return False
 
 class MultiShotRandomInvestor( MultiShotInvestor ):

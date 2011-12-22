@@ -21,26 +21,33 @@ def main(argv=None):
     options = parseCommandLine()
     startTime = time()
     results = []
+    printResult = True # print only results of first iteration
+    fileMode = "w"
     
     for i in range( 2000 ):
         inv = globals()[ options.strategy ]()
-        start = 850
+        start = 85
         end = -1
-        with open( options.dataFile ) as dataFile:
-            data = dataFile.readlines()
-            name, date, openPrice, highPrice, lowPrice, firstClosePrice, vol = data[start].split( "\t" )
-            name, date, openPrice, highPrice, lowPrice, lastClosePrice, vol = data[end].split( "\t" )
-            firstClosePrice, lastClosePrice = float( firstClosePrice ), float( lastClosePrice )
-            for line in data[ start:end ]:
-                if line[0] == "<":
-                    continue
-                name, date, openPrice, highPrice, lowPrice, closePrice, vol = line.split( "\t" )
-                data = StockData( name, date, openPrice, highPrice, lowPrice,
-                        closePrice, vol )
-                #print date, closePrice
-                inv.next( data )
-            results.append( inv.getBalance() )
-            
+        with open( options.dataFile ) as dataFile: 
+            with open( options.outputFile, fileMode ) as outputFile:
+                data = dataFile.readlines()
+                name, date, openPrice, highPrice, lowPrice, firstClosePrice, vol = data[start].split( "\t" )
+                name, date, openPrice, highPrice, lowPrice, lastClosePrice, vol = data[end].split( "\t" )
+                firstClosePrice, lastClosePrice = float( firstClosePrice ), float( lastClosePrice )
+                for line in data[ start:end ]:
+                    if line[0] == "<":
+                        continue
+                    name, date, openPrice, highPrice, lowPrice, closePrice, vol = line.split( "\t" )
+                    data = StockData( name, date, openPrice, highPrice, lowPrice,
+                            closePrice, vol )
+                    #print date, closePrice
+                    if printResult:
+                        outputFile.write( repr( inv.next( data ) ) )
+                    else:
+                        inv.next( data )
+                results.append( inv.getBalance() )
+        printResult = False
+        fileMode = "r"
 
     print "Financial result", sum( results ) / float( len( results ) )
     print "Price increase", 1000 * ( lastClosePrice / firstClosePrice )
@@ -58,6 +65,11 @@ def parseCommandLine():
     Stocker is a tool for stock exchange analysis ''')
     parser.add_option("-f", "--data", dest="dataFile", default="data.mst",
     help="File that contains stock exchange data for one company in mst format", metavar="DATAFILE")
+    parser.add_option("-o", "--output", dest="outputFile",
+            default="simulation.dat",
+    help="""Output file. It contains visualisation data from one simulation. Data
+    can be plotted using plot.sh script from tools. (Warning, output file will
+    be overwriten)""", metavar="OUTFILE")
     parser.add_option("-s", "--strategy", dest="strategy",
             default="OneShotInvestor",
     help="""Investment strategy you would like to check. Currently only available
