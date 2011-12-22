@@ -88,3 +88,14 @@ class MultiShotInvestor( BaseInvestor ):
         if len( self.history ) > 10:
             return ( self.history[-11].price / self.history[-1].price ) > self.roi
         return False
+
+class MultiShotRandomInvestor( MultiShotInvestor ):
+    def buyingStrategy( self, stockData ):
+        price = stockData.price
+        if self.cash > self.packSize:
+            if random() > 0.5:
+                if self.packSize / price:
+                    sharesToBuy = int( self.packSize / price )
+                    self.buy( sharesToBuy, price )
+                    self.packagePrices.append( price )
+                    self.packageShareCounts.append( sharesToBuy )

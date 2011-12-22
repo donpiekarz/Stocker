@@ -24,17 +24,17 @@ def main(argv=None):
     
     for i in range( 2000 ):
         inv = globals()[ options.strategy ]()
-        start = 85
+        start = 850
         end = -1
         with open( options.dataFile ) as dataFile:
             data = dataFile.readlines()
-            name, date, openPrice, highPrice, lowPrice, firstClosePrice, vol = data[start].split( "," )
-            name, date, openPrice, highPrice, lowPrice, lastClosePrice, vol = data[end].split( "," )
+            name, date, openPrice, highPrice, lowPrice, firstClosePrice, vol = data[start].split( "\t" )
+            name, date, openPrice, highPrice, lowPrice, lastClosePrice, vol = data[end].split( "\t" )
             firstClosePrice, lastClosePrice = float( firstClosePrice ), float( lastClosePrice )
             for line in data[ start:end ]:
                 if line[0] == "<":
                     continue
-                name, date, openPrice, highPrice, lowPrice, closePrice, vol = line.split( "," )
+                name, date, openPrice, highPrice, lowPrice, closePrice, vol = line.split( "\t" )
                 data = StockData( name, date, openPrice, highPrice, lowPrice,
                         closePrice, vol )
                 #print date, closePrice
@@ -61,7 +61,9 @@ def parseCommandLine():
     parser.add_option("-s", "--strategy", dest="strategy",
             default="OneShotInvestor",
     help="""Investment strategy you would like to check. Currently only available
-    are: OneShotInvestor and RandomInvestor. If you have written your own
+    are: OneShotInvestor, RandomInvestor, MultiShotInvestor and
+    MultiShotRandomInvestor. For more information please refer to
+    InvestmentStrategies.py file. If you have written your own
     strategy class in InvestmentStrategies.py filed this is the place to pass
     its name.""", metavar="DATAFILE")
     parser.add_option("-q", "--quiet",
