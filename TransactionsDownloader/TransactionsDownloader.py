@@ -11,7 +11,7 @@ from config import *
 
 # creates needed directories for transactions
 def checkDirs():
-    for company in configCompanies:
+    for company in configCompanies.tracked:
 	path = os.path.join(configTransactionsDir, company)
 	if(not os.path.exists(path)):
 	    os.makedirs(path)
@@ -26,10 +26,10 @@ def main():
 
 
 
-    for company in configCompanies:
+    for company in configCompanies.tracked:
 	path = os.path.join(configTransactionsDir, company, args["date"]+".csv")
 	
-	args["id"]=configTransactionsCompaniesIds[company]
+	args["id"]=configCompanies.onetIds[company]
 	
 	url = configTransactionsURL % args
 	print company, url
