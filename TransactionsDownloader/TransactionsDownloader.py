@@ -8,7 +8,8 @@ from optparse import OptionParser
 import re
 
 # project
-from config import *
+import stocker.config
+import stocker.utils
 
 
 # creates needed directories for transactions
@@ -22,26 +23,28 @@ def checkDirs():
 
 def main():
     print "TransactionsDownloader starts ..."
-
     options = parseCommandLine()
     args = { "date" : options.date }
-    
+    logger = utils.getLogger("TransactionsDownloader")
     checkDirs()
 
 
 
     for company in configCompanies.tracked:
-	path = os.path.join(configTransactionsDir, company, args["date"]+".csv")
-	
-	args["id"]=configCompanies.onetIds[company]
-	
-	url = configTransactionsURL % args
-	print company, url
-	
-	conn = urllib2.urlopen(url)
-	f = open(path, 'wb')
-	f.write(conn.read())
-	f.close()
+        path = os.path.join(configTransactionsDir, company, args["date"]+".csv")
+        
+        args["id"]=configCompanies.onetIds[company]
+        
+        url = configTransactionsURL % args
+        print company, url
+        
+        try:
+            conn = urllib2.urlopen(url)
+        except Exception as e:
+            print e
+        f = open(path, 'wb')
+        f.write(conn.read())
+        f.close()
 	
 	
     print "all done"
