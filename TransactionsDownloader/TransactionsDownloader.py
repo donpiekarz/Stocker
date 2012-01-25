@@ -6,6 +6,7 @@ import urllib2
 import time 
 from optparse import OptionParser
 import re
+import logging
 
 # project
 import stocker.utils
@@ -27,6 +28,8 @@ def main():
     options = parseCommandLine()
     args = { "date" : options.date }
     logger = stocker.utils.getLogger("TransactionsDownloader")
+    logger.info("BEGIN")
+    logger.info("Downloading data for date: %s" % args["date"])
     checkDirs()
 
 
@@ -38,17 +41,21 @@ def main():
         
         url = stocker.TransactionsDownloader.config.configTransactionsURL % args
         print company, url
+        logger.info("getting comapny: %s" % company)
+        logger.debug("url: %s" % url)
         
         try:
             conn = urllib2.urlopen(url)
         except Exception as e:
             print e
+            logger.error("Downloading data, url: %s" % url)
         f = open(path, 'wb')
         f.write(conn.read())
         f.close()
 	
 	
     print "all done"
+    logger.info("END")
 
 
 
