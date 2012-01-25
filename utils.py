@@ -5,7 +5,7 @@ import os
 
 # project
 
-import stocker.config 
+import config 
 
 
 def getLogger(app, level=config.logLevel):
