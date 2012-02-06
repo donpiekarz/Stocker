@@ -104,17 +104,18 @@ class MultiShotRandomInvestor( MultiShotInvestor ):
                     self.packageShareCounts.append( sharesToBuy )
                     
 class VolumeInvestor( BaseInvestor ):
-    def __init__( self, cash = 1000, shares = 0, volume = 10000 ):
+    def __init__( self, cash = 1000, shares = 0, buyingVolumeMax = 2000000, sellingVolumeMin = 3000000 ):
         # needs to call base class constructor
         super( VolumeInvestor, self ).__init__( cash, shares )
-        self.dstVolume = volume
+        self.buyingVolumeMax = buyingVolumeMax
+        self.sellingVolumeMin = sellingVolumeMin
 
     def buyingStrategy( self, stockData ):
         """"""
-        if self.cash > stockData.price and self.shares == 0 and stockData.volume > self.dstVolume:
+        if self.cash > stockData.price and self.shares == 0 and stockData.price * stockData.volume < self.buyingVolumeMax:
             self.buy( int( self.cash / stockData.price ), stockData.price )
 
     def sellingStrategy( self, stockData ):
         """"""
-        if ( self.shares > 0 and stockData.volume < self.dstVolume):
+        if ( self.shares > 0 and stockData.price * stockData.volume > self.sellingVolumeMin):
                 self.sell( self.shares, stockData.price )
