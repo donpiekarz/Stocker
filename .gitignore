@@ -1,6 +1,7 @@
 
 # python
 *.pyc
+.project
 
 
 #ignore thumbnails created by windows
