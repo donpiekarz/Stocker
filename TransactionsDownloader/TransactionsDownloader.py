@@ -44,11 +44,21 @@ def main():
         logger.info("getting comapny: %s" % company)
         logger.debug("url: %s" % url)
         
-        try:
-            conn = urllib2.urlopen(url)
-        except Exception as e:
-            print e
-            logger.error("Downloading data, url: %s" % url)
+        attempt = 0
+        success = False
+        while attempt < stocker.TransactionsDownloader.config.configMaxAttepmts and not success:
+            try:
+                conn = urllib2.urlopen(url)
+                success = True
+            except urllib2.URLError as e:
+                attempt += 1
+                logger.error("Downloading data, attempt: %d, Exception: %s, url: %s" % (attempt, e, url))
+        
+        if attempt >= stocker.TransactionsDownloader.config.configMaxAttepmts:
+            msg = "exceeded the maximum number of attempts: %d" % stocker.TransactionsDownloader.config.configMaxAttepmts
+            logger.critical(msg)
+            raise Exception(msg)
+        
         f = open(path, 'wb')
         f.write(conn.read())
         f.close()
