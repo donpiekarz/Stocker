@@ -3,6 +3,7 @@
 import sys
 import os
 import urllib2
+from cookielib import CookieJar
 import time 
 from optparse import OptionParser
 import re
@@ -48,7 +49,9 @@ def main():
         success = False
         while attempt < stocker.TransactionsDownloader.config.configMaxAttepmts and not success:
             try:
-                conn = urllib2.urlopen(url)
+                cj = CookieJar()
+                opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+                conn = opener.open(url)
                 success = True
             except urllib2.URLError as e:
                 attempt += 1
