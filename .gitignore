@@ -2,6 +2,7 @@
 # python
 *.pyc
 .project
+.pydevproject
 
 
 #ignore thumbnails created by windows
