@@ -14,13 +14,13 @@ class Stream:
     def add_file(self, company_id, date, filename_in):
         with open(filename_in, 'r') as f:
             for row in csv.reader(f, delimiter=';'):
-                print row
+                #print row
                 try:
                     desc = row[5]
                     if desc.startswith('TRANSAKCJA'):
                         amount = row[3]
                         limit_price = row[1]
-                        expiration_date = row[0] 
+                        expiration_date = "%s %s" % (date, row[0])
                         self.history.append(OrderBuy(company_id, amount, limit_price, expiration_date))
                         self.history.append(OrderSell(company_id, amount, limit_price, expiration_date))
                 except:
