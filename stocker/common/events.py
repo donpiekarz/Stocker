@@ -1,6 +1,6 @@
 
 
-class Event:
+class Event(object):
 	pass
 
 class EventStream(Event):
