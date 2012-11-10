@@ -9,10 +9,10 @@ class EventStream(Event):
 	def __init__(self, order):
 		self.order = order
 		
-class EventStreamAdd(EventStream):
+class EventStreamNew(EventStream):
 	
 	def __init__(self, order):
-		super(EventStreamAdd, self).__init__(order)
+		super(EventStreamNew, self).__init__(order)
 		
 class EventStreamDel(EventStream):
 	

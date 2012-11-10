@@ -4,7 +4,7 @@ import cPickle
 import csv
 import datetime
 
-from stocker.common.events import EventStreamAdd
+from stocker.common.events import EventStreamNew
 from stocker.common.orders import OrderBuy, OrderSell
 
 class Stream:
@@ -22,8 +22,8 @@ class Stream:
                         amount = row[3]
                         limit_price = row[1]
                         expiration_date = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
-                        self.history.append(EventStreamAdd(OrderBuy(company_id, amount, limit_price, expiration_date)))
-                        self.history.append(EventStreamAdd(OrderSell(company_id, amount, limit_price, expiration_date)))
+                        self.history.append(EventStreamNew(OrderBuy(company_id, amount, limit_price, expiration_date)))
+                        self.history.append(EventStreamNew(OrderSell(company_id, amount, limit_price, expiration_date)))
                 except IndexError:
                     pass
                 
