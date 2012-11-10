@@ -31,6 +31,7 @@ class Stream:
         pass
 
     def save(self, filename_out):
+        self.history.sort()
         with open(filename_out, 'w') as f:
             cPickle.dump(self, f)
 

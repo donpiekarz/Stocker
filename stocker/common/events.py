@@ -9,6 +9,9 @@ class EventStream(Event):
 	def __init__(self, order):
 		self.order = order
 		
+	def __lt__(self, other):
+		return self.order < other.order
+		
 class EventStreamNew(EventStream):
 	
 	def __init__(self, order):
