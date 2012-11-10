@@ -6,4 +6,5 @@ class Investor(object):
 class DummyInvestor(Investor):
 
     def process(self, event):
+        print event
         pass

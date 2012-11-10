@@ -7,6 +7,7 @@ class Order(object):
         self.amount = amount
         self.limit_price = limit_price
         self.expiration_date = expiration_date
+        self.owner = None
         
     def __lt__(self, other):
         return self.expiration_date < other.expiration_date
