@@ -6,6 +6,9 @@ class Stock(object):
         self.stream = stream
         self.investors = []
         
+    def add_investor(self, investor):
+        self.investors.append(investor)
+    
     def simulate(self):
         print "simulate"
     
