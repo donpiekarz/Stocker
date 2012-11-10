@@ -33,4 +33,9 @@ class Stream:
     def save(self, filename_out):
         with open(filename_out, 'w') as f:
             cPickle.dump(self, f)
+
+    @staticmethod
+    def load(filename_in):
+        with open(filename_in, 'r') as f:
+            return cPickle.load(f)
             
