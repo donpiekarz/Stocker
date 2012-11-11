@@ -55,7 +55,15 @@ class Stock(object):
             
             for inv in self.investors:
                 inv.process(event)
+                
+            self.match_orders()
         
+    def match_orders(self):
         
+        for key in self.companies.keys():
+            company = self.companies[key]
+            company['sell'].sort(key=lambda order: order.limit_price)
+            company['buy'].sort(key=lambda order: order.limit_price, reverse=True)
+            
     
     
