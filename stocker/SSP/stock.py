@@ -2,6 +2,7 @@
 import collections
 
 from stocker.common.orders import OrderBuy, OrderSell
+from stocker.common.events import EventStockTransaction
 
 
 class Stock(object):
@@ -60,10 +61,33 @@ class Stock(object):
         
     def match_orders(self):
         
+        event_list = []
+        
         for key in self.companies.keys():
-            company = self.companies[key]
-            company['sell'].sort(key=lambda order: order.limit_price)
-            company['buy'].sort(key=lambda order: order.limit_price, reverse=True)
+            buy_list = self.companies[key]['buy']
+            sell_list = self.companies[key]['sell']
+            
+            sell_list.sort(key=lambda order: order.limit_price)
+            buy_list.sort(key=lambda order: order.limit_price, reverse=True)
+            
+            while len(buy_list) > 0 and len(sell_list) > 0:
+                if buy_list[0].limit_price >= sell_list[0].limit_price:
+                    buy_order = buy_list.pop(0)
+                    sell_order = sell_list.pop(0)
+                    
+                    if buy_order.owner != self:
+                        event_list.append(EventStockTransaction(buy_order))
+                    if sell_order.owner != self:
+                        event_list.append(EventStockTransaction(sell_order))
+                else:
+                    break
+                    
+                    
+        for event in event_list:
+            event.order.owner.process(event)
+                    
+            
+            
             
     
     

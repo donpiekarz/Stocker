@@ -27,3 +27,7 @@ class EventStock(Event):
 	
 	pass
 		
+class EventStockTransaction(EventStock):
+	
+	def __init__(self, order):
+		self.order = order

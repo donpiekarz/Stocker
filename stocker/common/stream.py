@@ -3,6 +3,7 @@
 import cPickle
 import csv
 import datetime
+import decimal
 
 from stocker.common.events import EventStreamNew
 from stocker.common.orders import Order, OrderBuy, OrderSell
@@ -20,7 +21,7 @@ class Stream:
                     desc = row[5]
                     if desc.startswith('TRANSAKCJA'):
                         amount = row[3]
-                        limit_price = row[1]
+                        limit_price = decimal.Decimal(row[1].replace(',', '.'))
                         expiration_date = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
                         self.history.append(EventStreamNew(OrderBuy(company_id, amount, limit_price, expiration_date)))
                         self.history.append(EventStreamNew(OrderSell(company_id, amount, limit_price, expiration_date)))
