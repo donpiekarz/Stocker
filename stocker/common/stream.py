@@ -30,11 +30,11 @@ class Stream:
         
         pass
 
-    def sort_events(self, a, b):
+    def compare_events(self, a, b):
         return a.order.expiration_date < b.order.expiration_date
 
     def save(self, filename_out):
-        self.history.sort(self.sort_events)
+        self.history.sort(self.compare_events)
         with open(filename_out, 'w') as f:
             cPickle.dump(self, f)
 
