@@ -2,7 +2,7 @@
 import collections
 
 from stocker.common.orders import OrderBuy, OrderSell
-from stocker.common.events import EventStockTransaction
+from stocker.common.events import EventStockOrderNew, EventStockTransaction
 
 
 class Stock(object):
@@ -55,7 +55,7 @@ class Stock(object):
             self.new_order(order)
             
             for inv in self.investors:
-                inv.process(event)
+                inv.process(EventStockOrderNew(order))
                 
             self.match_orders()
         

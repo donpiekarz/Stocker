@@ -26,8 +26,21 @@ class EventStock(Event):
 	"""Event in Stock"""
 	
 	pass
+
+class EventStockOrderNew(EventStock):
+	
+	def __init__(self, order):
+		self.order = order	
+
+class EventStockOrderDel(EventStock):
+	
+	def __init__(self, order):
+		self.order = order
 		
 class EventStockTransaction(EventStock):
 	
 	def __init__(self, order):
 		self.order = order
+
+
+
