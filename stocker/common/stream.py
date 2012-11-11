@@ -5,7 +5,7 @@ import csv
 import datetime
 
 from stocker.common.events import EventStreamNew
-from stocker.common.orders import OrderBuy, OrderSell
+from stocker.common.orders import Order, OrderBuy, OrderSell
 
 class Stream:
     
@@ -30,11 +30,8 @@ class Stream:
         
         pass
 
-    def compare_events(self, a, b):
-        return a.order.expiration_date < b.order.expiration_date
-
     def save(self, filename_out):
-        self.history.sort(self.compare_events)
+        self.history.sort(key=lambda event: event.order.expiration_date)
         with open(filename_out, 'w') as f:
             cPickle.dump(self, f)
 
