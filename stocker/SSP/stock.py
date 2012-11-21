@@ -9,11 +9,8 @@ class Stock(object):
     
     def __init__(self, stream):
         self.stream = stream
-        self.investors = []
+        self.stockbrokers = []
         self.companies = collections.defaultdict(dict)
-        
-    def add_investor(self, investor):
-        self.investors.append(investor)
     
     def new_order(self, order):
         if order.owner is None:
@@ -54,8 +51,8 @@ class Stock(object):
             order.owner = self
             self.new_order(order)
             
-            for inv in self.investors:
-                inv.process(EventStockOrderNew(order))
+            for sb in self.stockbrokers:
+                sb.process(EventStockOrderNew(order))
                 
             self.match_orders()
         
