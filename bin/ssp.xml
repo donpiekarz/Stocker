@@ -1,0 +1,13 @@
+
+<Player>
+	<Stock>
+		<stream>C:\code\stocker\data\amica-2012-11-08.stm</stream>
+		<Stockbroker>
+			<provision>0.38</provision>
+			<Investor module="stocker.SSP.investor" class="DummyInvestor">
+				<cash>1000</cash>
+			</Investor>
+		</Stockbroker>
+	</Stock>
+	
+</Player>

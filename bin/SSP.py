@@ -2,7 +2,12 @@
 
 """Stocker Stream Player"""
 
-from stocker.SSP.main import main
+import sys
+
+from stocker.SSP.player import Player
 
 if __name__ == "__main__":
-    main()
+    #conf = sys.argv[1]
+    conf = "ssp.xml"
+    Player.main(conf)
+    
