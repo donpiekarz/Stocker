@@ -12,6 +12,7 @@ from stocker.common.orders import OrderBuy, OrderSell
 
 from stocker.SSP.stock import Stock
 from stocker.SSP.stockbroker import Stockbroker
+from stocker.SSP.investor import DummyInvestor
 
 
 XML1 = """\
@@ -58,6 +59,12 @@ class StockTestCase(unittest.TestCase):
         self.assertIsInstance(stock.stream, Stream)
         self.assertEqual(len(stock.stream.history), 2)
         self.assertEqual(len(stock.stockbrokers), 1)
+        self.assertEqual(len(stock.stockbrokers[0].investors), 1)
+        self.assertEqual(len(stock.stockbrokers[0].accounts), 1)
+        self.assertEqual(stock.stockbrokers[0].stock, stock)
+        self.assertIsInstance(stock.stockbrokers[0], Stockbroker)
+        self.assertIsInstance(stock.stockbrokers[0].investors[0], DummyInvestor)
+        self.assertEqual(stock.stockbrokers[0].investors[0].cash, 1000)
 
         
         

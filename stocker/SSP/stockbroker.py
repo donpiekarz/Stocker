@@ -19,9 +19,6 @@ class Stockbroker( object ):
     def create_from_config(stock, stockbroker_tree):
         stockbroker = Stockbroker(stock)
         
-        return stockbroker
-
-    def load_config(self, stockbroker_tree):
         for inv_tree in stockbroker_tree.getElementsByTagName("Investor"):
             module_name = inv_tree.getAttribute("module")
             __import__(module_name)
@@ -29,10 +26,12 @@ class Stockbroker( object ):
             
             inv_class = getattr(module, inv_tree.getAttribute("class"))
             
-            inv = inv_class(self, inv_tree)
+            inv = inv_class(stockbroker, inv_tree)
             
-            self.investors.append(inv)
-            self.accounts[inv] = Account()
+            stockbroker.investors.append(inv)
+            stockbroker.accounts[inv] = Account()
+        
+        return stockbroker
 
     def new_order(self, order):
         pass
