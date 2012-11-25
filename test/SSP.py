@@ -59,10 +59,12 @@ class StockTestCase(unittest.TestCase):
         self.assertIsInstance(stock.stream, Stream)
         self.assertEqual(len(stock.stream.history), 2)
         self.assertEqual(len(stock.stockbrokers), 1)
+        self.assertIsNotNone(stock.stockbrokers[0])
         self.assertEqual(len(stock.stockbrokers[0].investors), 1)
         self.assertEqual(len(stock.stockbrokers[0].accounts), 1)
         self.assertEqual(stock.stockbrokers[0].stock, stock)
         self.assertIsInstance(stock.stockbrokers[0], Stockbroker)
+        self.assertIsNotNone(stock.stockbrokers[0].investors[0])
         self.assertIsInstance(stock.stockbrokers[0].investors[0], DummyInvestor)
         self.assertEqual(stock.stockbrokers[0].investors[0].cash, 1000)
 

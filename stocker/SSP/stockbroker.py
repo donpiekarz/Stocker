@@ -2,6 +2,8 @@
 
 import sys
 
+from stocker.SSP.investor import Investor
+
 class Account ( object ):
     pass
 
@@ -20,13 +22,7 @@ class Stockbroker( object ):
         stockbroker = Stockbroker(stock)
         
         for inv_tree in stockbroker_tree.getElementsByTagName("Investor"):
-            module_name = inv_tree.getAttribute("module")
-            __import__(module_name)
-            module = sys.modules[module_name]
-            
-            inv_class = getattr(module, inv_tree.getAttribute("class"))
-            
-            inv = inv_class(stockbroker, inv_tree)
+            inv = Investor.create_from_config(stockbroker, inv_tree)
             
             stockbroker.investors.append(inv)
             stockbroker.accounts[inv] = Account()
