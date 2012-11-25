@@ -36,6 +36,8 @@ class Stockbroker( object ):
         pass
     
     def process(self, event):
-        pass
+        for inv in self.investors:
+            inv.process(event)
+                
     
     pass

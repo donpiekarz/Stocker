@@ -15,20 +15,7 @@ class Player ( object ):
         main_tree = minidom.parse(config_file)
         
         stock_tree = main_tree.childNodes[0].getElementsByTagName("Stock")[0]
-        stock = Stock(stock_tree)
-        
-        """
-        data_dir = 'C:\\code\\stocker\\data'
-        filename_in = os.path.join(data_dir, 'amica-2012-11-08.stm')
-        
-        
-        stream = Stream.load(filename_in)
-        
-        
-        inv1 = DummyInvestor(stock)
-        
-        stock.add_investor(inv1)
-        """
+        stock = Stock.create_from_config(stock_tree)
         
         stock.simulate()
     
