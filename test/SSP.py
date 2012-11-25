@@ -22,7 +22,7 @@ XML1 = """\
         <Stockbroker>
             <provision>0.38</provision>
             <Investor module="stocker.SSP.investor" class="DummyInvestor">
-                <cash>1000</cash>
+                <cash type="int">1000</cash>
             </Investor>
         </Stockbroker>
     </Stock>
