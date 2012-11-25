@@ -5,8 +5,15 @@ import sys
 from stocker.SSP.investor import Investor
 
 class Account ( object ):
-    pass
+    cash = 0
+    cash_blocked = 0
+    shares = []
+    shares_blocked = []
 
+    class NotEnoughCashError(Exception):
+        pass
+    class NotEnoughSharesError(Exception):
+        pass
 
 class Stockbroker( object ):
     
@@ -38,6 +45,14 @@ class Stockbroker( object ):
     def process(self, event):
         for inv in self.investors:
             inv.process(event)
-                
-    
-    pass
+
+    def add_investor(self, investor):
+        self.investors.append(investor)
+        self.accounts[investor] = Account()
+        
+    def transfer_cash(self, owner, amount):
+        pass
+        
+    class MissingOwnerError(Exception):
+        pass
+        
