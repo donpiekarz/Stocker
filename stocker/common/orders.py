@@ -8,6 +8,10 @@ class Order(object):
         self.limit_price = limit_price
         self.expiration_date = expiration_date
         self.owner = None
+        
+    def __eq__(self, other):
+        return self.company_id == other.company_id and self.amount == other.amount and self.limit_price == other.limit_price and self.expiration_date == other.expiration_date
+        
 
 class OrderBuy(Order):
     

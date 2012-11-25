@@ -1,25 +1,26 @@
 
 
 import sys
+import collections
+import decimal
+
+from stocker.common.orders import OrderBuy, OrderSell
 
 from stocker.SSP.investor import Investor
 
 class Account ( object ):
     cash = 0
     cash_blocked = 0
-    shares = []
-    shares_blocked = []
+    shares = collections.defaultdict(int)
+    shares_blocked = collections.defaultdict(int)
 
-    class NotEnoughCashError(Exception):
-        pass
-    class NotEnoughSharesError(Exception):
-        pass
 
 class Stockbroker( object ):
     
     stock = None
     investors = []
     accounts = {}
+    orders = {}
     
     def __init__(self, stock):
         self.stock = stock
@@ -37,7 +38,30 @@ class Stockbroker( object ):
         return stockbroker
 
     def new_order(self, order):
-        pass
+        if order.owner is None:
+            raise self.MissingOwnerError
+        
+        account = self.accounts[order.owner]
+        
+        if isinstance(order, OrderBuy):
+            value = order.amount * order.limit_price
+            if account.cash < value:
+                raise self.NotEnoughCashError
+             
+            account.cash -= value
+            account.cash_blocked += value
+            
+            self.stock.new_order(order)
+            
+        elif isinstance(order, OrderSell):
+            if account.shares[order.company_id] < order.amount:
+                raise self.NotEnoughSharesError
+            
+            account.shares[order.company_id] -= order.amount
+            account.shares_blocked[order.company_id] += order.amount
+            
+            self.stock.new_order(order)
+            
     
     def del_order(self, order):
         pass
@@ -50,9 +74,13 @@ class Stockbroker( object ):
         self.investors.append(investor)
         self.accounts[investor] = Account()
         
-    def transfer_cash(self, owner, amount):
-        pass
+    def transfer_cash(self, owner, cash):
+        self.accounts[owner].cash += cash
         
     class MissingOwnerError(Exception):
+        pass
+    class NotEnoughCashError(Exception):
+        pass
+    class NotEnoughSharesError(Exception):
         pass
         
