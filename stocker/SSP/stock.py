@@ -1,16 +1,33 @@
 
 import collections
 
+from stocker.common.stream import Stream
 from stocker.common.orders import OrderBuy, OrderSell
 from stocker.common.events import EventStockOrderNew, EventStockTransaction
+
+from stocker.SSP.stockbroker import Stockbroker
 
 
 class Stock(object):
     
-    def __init__(self, stream):
-        self.stream = stream
-        self.stockbrokers = []
-        self.companies = collections.defaultdict(dict)
+    stream = None
+    stockbrokers = []
+    companies = collections.defaultdict(dict)
+    
+    def __init__(self):
+        pass
+    
+    @staticmethod
+    def create_from_config(stock_tree):
+        stock = Stock()
+        
+        stock.stream = Stream.load(stock_tree.getElementsByTagName("stream")[0].firstChild.nodeValue)
+        
+        for sb_tree in stock_tree.getElementsByTagName("Stockbroker"):
+            sb = Stockbroker.create_from_config(stock, sb_tree)
+            stock.stockbrokers.append(sb)
+            
+        return stock
     
     def new_order(self, order):
         if order.owner is None:
