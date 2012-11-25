@@ -45,7 +45,7 @@ class StockTestCase(unittest.TestCase):
         
 
     def tearDown(self):
-        pass
+        os.remove(self.stream_file)
 
 
     def test_create_from_config(self):
