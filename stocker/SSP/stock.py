@@ -29,9 +29,8 @@ class Stock(object):
             
         return stock
     
-    def new_order(self, order):
-        if order.owner is None:
-            raise Exception("Order.owner is None!")
+    def new_order(self, order, stockbroker):
+        order.stockbroker = stockbroker
 
         if not self.companies[order.company_id]:
             self.companies[order.company_id]['sell'] = []
@@ -45,9 +44,8 @@ class Stock(object):
         
         pass
     
-    def del_order(self, order):
-        if order.owner is None:
-            raise Exception("Order.owner is None!")
+    def del_order(self, order, stockbroker):
+        order.stockbroker = stockbroker
         
         if not self.companies[order.company_id]:
             self.companies[order.company_id]['sell'] = []
@@ -98,7 +96,7 @@ class Stock(object):
                     
                     
         for event in event_list:
-            event.order.owner.process(event)
+            event.order.stockbroker.process(event)
                     
             
             

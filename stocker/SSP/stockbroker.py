@@ -37,11 +37,10 @@ class Stockbroker( object ):
         
         return stockbroker
 
-    def new_order(self, order):
-        if order.owner is None:
-            raise self.MissingOwnerError
+    def new_order(self, order, investor):
+        order.investor = investor
         
-        account = self.accounts[order.owner]
+        account = self.accounts[order.investor]
         
         if isinstance(order, OrderBuy):
             value = order.amount * order.limit_price
@@ -51,7 +50,7 @@ class Stockbroker( object ):
             account.cash -= value
             account.cash_blocked += value
             
-            self.stock.new_order(order)
+            self.stock.new_order(order, self)
             
         elif isinstance(order, OrderSell):
             if account.shares[order.company_id] < order.amount:
@@ -60,7 +59,7 @@ class Stockbroker( object ):
             account.shares[order.company_id] -= order.amount
             account.shares_blocked[order.company_id] += order.amount
             
-            self.stock.new_order(order)
+            self.stock.new_order(order, self)
             
     
     def del_order(self, order):
@@ -77,8 +76,6 @@ class Stockbroker( object ):
     def transfer_cash(self, owner, cash):
         self.accounts[owner].cash += cash
         
-    class MissingOwnerError(Exception):
-        pass
     class NotEnoughCashError(Exception):
         pass
     class NotEnoughSharesError(Exception):

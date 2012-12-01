@@ -77,7 +77,8 @@ class StockbrokerTestCase(unittest.TestCase):
     
     class MyStock(Stock):
         order = None
-        def new_order(self, order):
+        def new_order(self, order, stockbroker):
+            order.stockbroker = stockbroker
             self.order = order
     
     def setUp(self):
@@ -94,35 +95,33 @@ class StockbrokerTestCase(unittest.TestCase):
     def test_new_order(self):
         order1 = OrderBuy('cia', 10, 11.22, datetime.datetime.now())
         order2 = OrderSell('cia', 10, 11.33, datetime.datetime.now())
-        order1.owner = self.investor
-        order2.owner = self.investor
-        order3 = OrderSell('cia', 10, 11.11, datetime.datetime.now())
         
-        self.assertRaises(Stockbroker.MissingOwnerError, self.investor.stockbroker.new_order, order3)
-        self.assertRaises(Stockbroker.NotEnoughCashError, self.investor.stockbroker.new_order, order1)
-        self.assertRaises(Stockbroker.NotEnoughSharesError, self.investor.stockbroker.new_order, order2)
+        self.assertRaises(Stockbroker.NotEnoughCashError, self.investor.stockbroker.new_order, order1, self.investor)
+        self.assertRaises(Stockbroker.NotEnoughSharesError, self.investor.stockbroker.new_order, order2, self.investor)
         
         self.stockbroker.transfer_cash(self.investor, 112.2)
         
         self.assertEqual(self.stockbroker.accounts[self.investor].cash, 112.2)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
         self.assertIsNone(self.stock.order)
-        self.investor.stockbroker.new_order(order1)
+        self.investor.stockbroker.new_order(order1, self.investor)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash, 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 112.2)
         self.assertIsNotNone(self.stock.order)
         self.assertEqual(self.stock.order, order1)
-        self.assertEqual(self.stock.order.owner, self.stockbroker)
+        self.assertEqual(self.stock.order.investor, self.investor)
+        self.assertEqual(self.stock.order.stockbroker, self.stockbroker)
         
         self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
         self.stockbroker.accounts[self.investor].shares['cia'] += 10
         self.stock.order = None
-        self.investor.stockbroker.new_order(order2)
+        self.investor.stockbroker.new_order(order2, self.investor)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 10)
         self.assertIsNotNone(self.stock.order)
         self.assertEqual(self.stock.order, order2)
-        self.assertEqual(self.stock.order.owner, self.stockbroker)
+        self.assertEqual(self.stock.order.investor, self.investor)
+        self.assertEqual(self.stock.order.stockbroker, self.stockbroker)
         
         
         
