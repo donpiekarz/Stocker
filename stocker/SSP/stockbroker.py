@@ -5,6 +5,7 @@ import collections
 import decimal
 
 from stocker.common.orders import OrderBuy, OrderSell
+from stocker.common.events import EventStockTransaction
 
 from stocker.SSP.investor import Investor
 
@@ -66,8 +67,28 @@ class Stockbroker( object ):
         pass
     
     def process(self, event):
-        for inv in self.investors:
-            inv.process(event)
+        if event.order.investor:
+            if isinstance(event, EventStockTransaction): self.process_transaction(event)
+
+        else:
+            for inv in self.investors:
+                inv.process(event)
+
+    def process_transaction(self, event):
+        order = event.order
+        account = self.accounts[order.investor]
+        value = order.amount * order.limit_price
+        
+        if isinstance(order, OrderBuy):
+            account.cash_blocked -= value
+            account.shares[order.company_id] += order.amount
+            
+        elif isinstance(order, OrderSell):
+            account.cash += value
+            account.shares_blocked[order.company_id] -= order.amount
+        
+        event.order.investor.process(event)
+            
 
     def add_investor(self, investor):
         self.investors.append(investor)
