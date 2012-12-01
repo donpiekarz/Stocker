@@ -7,7 +7,7 @@ import datetime
 from xml.dom import minidom 
 
 from stocker.common.stream import Stream
-from stocker.common.events import EventStreamNew
+from stocker.common.events import EventStreamNew, EventStockTransaction
 from stocker.common.orders import OrderBuy, OrderSell
 
 from stocker.SSP.stock import Stock
@@ -86,6 +86,9 @@ class StockbrokerTestCase(unittest.TestCase):
         self.stockbroker = Stockbroker(self.stock)
         self.investor = self.MyInvestor(self.stockbroker)
         self.stockbroker.add_investor(self.investor)
+        
+        self.order1 = OrderBuy('cia', 10, 11.22, datetime.datetime.now())
+        self.order2 = OrderSell('cia', 10, 11.33, datetime.datetime.now())
 
     def tearDown(self):
         pass
@@ -93,35 +96,69 @@ class StockbrokerTestCase(unittest.TestCase):
     
 
     def test_new_order(self):
-        order1 = OrderBuy('cia', 10, 11.22, datetime.datetime.now())
-        order2 = OrderSell('cia', 10, 11.33, datetime.datetime.now())
         
-        self.assertRaises(Stockbroker.NotEnoughCashError, self.investor.stockbroker.new_order, order1, self.investor)
-        self.assertRaises(Stockbroker.NotEnoughSharesError, self.investor.stockbroker.new_order, order2, self.investor)
+        
+        self.assertRaises(Stockbroker.NotEnoughCashError, self.investor.stockbroker.new_order, self.order1, self.investor)
+        self.assertRaises(Stockbroker.NotEnoughSharesError, self.investor.stockbroker.new_order, self.order2, self.investor)
         
         self.stockbroker.transfer_cash(self.investor, 112.2)
         
         self.assertEqual(self.stockbroker.accounts[self.investor].cash, 112.2)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
         self.assertIsNone(self.stock.order)
-        self.investor.stockbroker.new_order(order1, self.investor)
+        self.investor.stockbroker.new_order(self.order1, self.investor)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash, 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 112.2)
         self.assertIsNotNone(self.stock.order)
-        self.assertEqual(self.stock.order, order1)
+        self.assertEqual(self.stock.order, self.order1)
         self.assertEqual(self.stock.order.investor, self.investor)
         self.assertEqual(self.stock.order.stockbroker, self.stockbroker)
         
         self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
         self.stockbroker.accounts[self.investor].shares['cia'] += 10
         self.stock.order = None
-        self.investor.stockbroker.new_order(order2, self.investor)
+        self.investor.stockbroker.new_order(self.order2, self.investor)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 10)
         self.assertIsNotNone(self.stock.order)
-        self.assertEqual(self.stock.order, order2)
+        self.assertEqual(self.stock.order, self.order2)
         self.assertEqual(self.stock.order.investor, self.investor)
         self.assertEqual(self.stock.order.stockbroker, self.stockbroker)
+        
+    def test_process_transaction(self):
+        self.stockbroker.accounts[self.investor].cash = 0
+        self.stockbroker.accounts[self.investor].cash_blocked = 0
+        self.stockbroker.accounts[self.investor].shares['cia'] = 0
+        self.stockbroker.accounts[self.investor].shares_blocked['cia'] = 0
+        
+        self.stockbroker.transfer_cash(self.investor, 112.2)
+        self.investor.stockbroker.new_order(self.order1, self.investor)
+        
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash, 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 112.2)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 0)
+        event = EventStockTransaction(self.order1)
+        self.stockbroker.process(event)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash, 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 10)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 0)
+        self.assertEqual(self.investor.event, event)
+        
+        self.investor.stockbroker.new_order(self.order2, self.investor)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash, 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 10)
+        event = EventStockTransaction(self.order2)
+        self.stockbroker.process(event)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash, 113.3)
+        self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
+        self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 0)
+        self.assertEqual(self.investor.event, event)
+        
         
         
         
