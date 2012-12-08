@@ -3,7 +3,7 @@ import collections
 
 from stocker.common.stream import Stream
 from stocker.common.orders import OrderBuy, OrderSell
-from stocker.common.events import EventStockOrderNew, EventStockTransaction
+from stocker.common.events import EventStreamNew, EventStockOrderNew, EventStockTransaction, EventStockOpen, EventStockClose
 
 from stocker.SSP.stockbroker import Stockbroker
 
@@ -62,14 +62,20 @@ class Stock(object):
     def simulate(self):
         
         for event in self.stream.history:
-            order = event.order
-            order.owner = self
-            self.new_order(order, None)
             
-            for sb in self.stockbrokers:
-                sb.process(EventStockOrderNew(event.timestamp, order))
+            if isinstance(event, (EventStockOpen, EventStockClose)):
+                for sb in self.stockbrokers:
+                    sb.process(event)
+                    
+            elif isinstance(event, (EventStreamNew, )):
+                order = event.order
+                order.owner = self
+                self.new_order(order, None)
                 
-            self.match_orders()
+                for sb in self.stockbrokers:
+                    sb.process(EventStockOrderNew(event.timestamp, order))
+                    
+                self.match_orders()
         
     def match_orders(self):
         

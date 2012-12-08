@@ -46,7 +46,7 @@ class StockTestCase(unittest.TestCase):
         
 
     def tearDown(self):
-        os.remove(self.stream_file)
+        #os.remove(self.stream_file)
         pass
 
 
@@ -59,7 +59,7 @@ class StockTestCase(unittest.TestCase):
         
         self.assertIsNotNone(stock)
         self.assertIsInstance(stock.stream, Stream)
-        self.assertEqual(len(stock.stream.history), 2)
+        self.assertEqual(len(stock.stream.history), 4)
         self.assertEqual(len(stock.stockbrokers), 1)
         self.assertIsNotNone(stock.stockbrokers[0])
         self.assertEqual(len(stock.stockbrokers[0].investors), 1)

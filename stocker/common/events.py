@@ -36,4 +36,14 @@ class EventStockTransaction(EventStock):
 	pass
 
 
+class EventStockOpen(Event):
+	"""Now stock is open"""
+	def __init__(self, timestamp):
+		self.timestamp = timestamp
+
+class EventStockClose(Event):
+	"""Now stock is close"""
+	def __init__(self, timestamp):
+		self.timestamp = timestamp
+
 

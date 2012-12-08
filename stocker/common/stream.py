@@ -5,7 +5,7 @@ import csv
 import datetime
 import decimal
 
-from stocker.common.events import EventStreamNew
+from stocker.common.events import EventStreamNew, EventStockOpen, EventStockClose
 from stocker.common.orders import Order, OrderBuy, OrderSell
 
 class Stream:
@@ -32,7 +32,19 @@ class Stream:
         
         pass
 
+    def add_stock_events(self):
+        dates = {}
+        
+        for e in self.history:
+            dates[e.timestamp.date()] = 1
+            
+        for d in dates.keys():
+            self.history.append(EventStockOpen(datetime.datetime.combine(d, datetime.time(9, 0))))
+            self.history.append(EventStockClose(datetime.datetime.combine(d, datetime.time(18, 0))))
+        
+
     def save(self, filename_out):
+        self.add_stock_events()
         self.history.sort(key=lambda event: event.timestamp)
         with open(filename_out, 'w') as f:
             cPickle.dump(self, f)
