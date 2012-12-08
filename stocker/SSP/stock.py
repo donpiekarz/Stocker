@@ -69,7 +69,7 @@ class Stock(object):
                     
             elif isinstance(event, (EventStreamNew, )):
                 order = event.order
-                order.owner = self
+                order.owner = None
                 self.new_order(order, None)
                 
                 for sb in self.stockbrokers:
@@ -93,16 +93,20 @@ class Stock(object):
                     buy_order = buy_list.pop(0)
                     sell_order = sell_list.pop(0)
                     
-                    if not buy_order.stockbroker is None:
-                        event_list.append(EventStockTransaction(buy_order))
-                    if not sell_order.stockbroker is None:
-                        event_list.append(EventStockTransaction(sell_order))
+                    event_list.append(EventStockTransaction(1, buy_order, sell_order))
                 else:
                     break
                     
                     
         for event in event_list:
-            event.order.stockbroker.process(event)
+            if event.buy_order.stockbroker is None and event.sell_order.stockbroker is None:
+                for sb in self.stockbrokers:
+                    sb.process(event)
+            else:
+                if not event.buy_order.stockbroker is None:
+                    event.buy_order.stockbroker.process(event)
+                if not event.sell_order.stockbroker is None:
+                    event.sell_order.stockbroker.process(event)
                     
             
             

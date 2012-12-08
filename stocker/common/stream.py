@@ -4,6 +4,7 @@ import cPickle
 import csv
 import datetime
 import decimal
+import os
 
 from stocker.common.events import EventStreamNew, EventStockOpen, EventStockClose
 from stocker.common.orders import Order, OrderBuy, OrderSell
@@ -20,7 +21,7 @@ class Stream:
                 try:
                     desc = row[5]
                     if desc.startswith('TRANSAKCJA'):
-                        amount = row[3]
+                        amount = int(row[3])
                         limit_price = decimal.Decimal(row[1].replace(',', '.'))
                         timestamp = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
                         expiration_date = timestamp + datetime.timedelta(days=1)
@@ -29,8 +30,12 @@ class Stream:
                 except IndexError:
                     pass
                 
-        
-        pass
+    def walk(self, dir_path):
+        for dir in os.walk(dir_path).next()[1]:
+            for file in os.walk(os.path.join(dir_path, dir)).next()[2]:
+                file_path = os.path.join(dir_path, dir, file)
+                date = os.path.splitext(file)[0]
+                self.add_file(dir, date, file_path)
 
     def add_stock_events(self):
         dates = {}

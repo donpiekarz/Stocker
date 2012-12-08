@@ -1,11 +1,12 @@
 
 <Player>
 	<Stock>
-		<stream>C:\code\stocker\data\amica-2012-11-08.stm</stream>
+		<stream>C:\code\stoker_data\stream1.stm</stream>
 		<Stockbroker>
 			<provision>0.38</provision>
-			<Investor module="stocker.SSP.investor" class="DummyInvestor">
+			<Investor module="stocker.SSP.genetic_investor" class="GeneticInvestor">
 				<cash type="int">1000</cash>
+				<learning type="int">25</learning>
 			</Investor>
 		</Stockbroker>
 	</Stock>

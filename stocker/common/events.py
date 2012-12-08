@@ -32,8 +32,11 @@ class EventStockOrderNew(EventStock):
 class EventStockOrderDel(EventStock):
 	pass
 		
-class EventStockTransaction(EventStock):
-	pass
+class EventStockTransaction(Event):
+	def __init__(self, timestamp, buy_order, sell_order):
+		self.timestamp = timestamp
+		self.buy_order = buy_order
+		self.sell_order = sell_order
 
 
 class EventStockOpen(Event):

@@ -69,17 +69,21 @@ class Stockbroker( object ):
     def process(self, event):
         
         if isinstance(event, EventStockTransaction): 
-            self.process_transaction(event)
+            
+            if event.buy_order.investor or event.sell_order.investor: self.process_transaction(event)
+            else: 
+                for inv in self.investors:
+                    inv.process(event)
 
         else:
             for inv in self.investors:
                 inv.process(event)
 
     def process_transaction(self, event):
-        if not event.order.investor:
-            return
-         
-        order = event.order
+        if event.buy_order.investor:
+            order = event.buy_order
+        elif event.sell_order.investor:
+            order = event.sell_order
         account = self.accounts[order.investor]
         value = order.amount * order.limit_price
         
