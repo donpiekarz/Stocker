@@ -6,41 +6,34 @@ class Event(object):
 class EventStream(Event):
 	"""Event in Stream"""
 	
-	def __init__(self, order):
+	def __init__(self, timestamp, order):
+		self.timestamp = timestamp
 		self.order = order
 		
 	def __lt__(self, other):
 		return self.order < other.order
 		
 class EventStreamNew(EventStream):
-	
-	def __init__(self, order):
-		super(EventStreamNew, self).__init__(order)
+	pass
 		
 class EventStreamDel(EventStream):
-	
-	def __init__(self, order):
-		super(EventStreamDel, self).__init__(order)
+	pass
 		
 class EventStock(Event):
 	"""Event in Stock"""
 	
-	pass
+	def __init__(self, timestamp, order):
+		self.timestamp = timestamp
+		self.order = order
 
 class EventStockOrderNew(EventStock):
-	
-	def __init__(self, order):
-		self.order = order	
+	pass
 
 class EventStockOrderDel(EventStock):
-	
-	def __init__(self, order):
-		self.order = order
+	pass
 		
 class EventStockTransaction(EventStock):
-	
-	def __init__(self, order):
-		self.order = order
+	pass
 
 
 

@@ -64,10 +64,10 @@ class Stock(object):
         for event in self.stream.history:
             order = event.order
             order.owner = self
-            self.new_order(order)
+            self.new_order(order, self)
             
             for sb in self.stockbrokers:
-                sb.process(EventStockOrderNew(order))
+                sb.process(EventStockOrderNew(event.timestamp, order))
                 
             self.match_orders()
         

@@ -22,9 +22,10 @@ class Stream:
                     if desc.startswith('TRANSAKCJA'):
                         amount = row[3]
                         limit_price = decimal.Decimal(row[1].replace(',', '.'))
-                        expiration_date = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
-                        self.history.append(EventStreamNew(OrderBuy(company_id, amount, limit_price, expiration_date)))
-                        self.history.append(EventStreamNew(OrderSell(company_id, amount, limit_price, expiration_date)))
+                        timestamp = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
+                        expiration_date = timestamp + datetime.timedelta(days=1)
+                        self.history.append(EventStreamNew(timestamp, OrderBuy(company_id, amount, limit_price, expiration_date)))
+                        self.history.append(EventStreamNew(timestamp, OrderSell(company_id, amount, limit_price, expiration_date)))
                 except IndexError:
                     pass
                 
