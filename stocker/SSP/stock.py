@@ -64,7 +64,7 @@ class Stock(object):
         for event in self.stream.history:
             order = event.order
             order.owner = self
-            self.new_order(order, self)
+            self.new_order(order, None)
             
             for sb in self.stockbrokers:
                 sb.process(EventStockOrderNew(event.timestamp, order))
@@ -87,9 +87,9 @@ class Stock(object):
                     buy_order = buy_list.pop(0)
                     sell_order = sell_list.pop(0)
                     
-                    if buy_order.owner != self:
+                    if not buy_order.stockbroker is None:
                         event_list.append(EventStockTransaction(buy_order))
-                    if sell_order.owner != self:
+                    if not sell_order.stockbroker is None:
                         event_list.append(EventStockTransaction(sell_order))
                 else:
                     break

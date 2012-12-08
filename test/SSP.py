@@ -35,9 +35,10 @@ class StockTestCase(unittest.TestCase):
 
 
     def setUp(self):
+        self.now = datetime.datetime.now()
         self.stream = Stream()
-        self.stream.history.append(EventStreamNew(OrderBuy("CIA", 10, 21.34, datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
-        self.stream.history.append(EventStreamNew(OrderSell("CIA", 10, 21.34, datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
+        self.stream.history.append(EventStreamNew(self.now, OrderBuy("CIA", 10, 21.34, datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
+        self.stream.history.append(EventStreamNew(self.now, OrderSell("CIA", 10, 21.34, datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
         
         self.stream_file = tempfile.mkstemp()[1]
         self.stream.save(self.stream_file)
@@ -49,7 +50,7 @@ class StockTestCase(unittest.TestCase):
         pass
 
 
-    def _test_create_from_config(self):
+    def test_create_from_config(self):
 
         tree = minidom.parseString(self.xml1)
         stock_tree = tree.getElementsByTagName("Stock")[0]
@@ -88,8 +89,10 @@ class StockbrokerTestCase(unittest.TestCase):
         self.investor = self.MyInvestor(self.stockbroker)
         self.stockbroker.add_investor(self.investor)
         
-        self.order1 = OrderBuy('cia', 10, 11.22, datetime.datetime.now())
-        self.order2 = OrderSell('cia', 10, 11.33, datetime.datetime.now())
+        self.now = datetime.datetime.now()
+        
+        self.order1 = OrderBuy('cia', 10, 11.22, self.now)
+        self.order2 = OrderSell('cia', 10, 11.33, self.now)
 
     def tearDown(self):
         pass
@@ -139,7 +142,7 @@ class StockbrokerTestCase(unittest.TestCase):
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 112.2)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 0)
-        event = EventStockTransaction(self.order1)
+        event = EventStockTransaction(self.now, self.order1)
         self.stockbroker.process(event)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash, 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
@@ -152,7 +155,7 @@ class StockbrokerTestCase(unittest.TestCase):
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares['cia'], 0)
         self.assertEqual(self.stockbroker.accounts[self.investor].shares_blocked['cia'], 10)
-        event = EventStockTransaction(self.order2)
+        event = EventStockTransaction(self.now, self.order2)
         self.stockbroker.process(event)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash, 113.3)
         self.assertEqual(self.stockbroker.accounts[self.investor].cash_blocked, 0)

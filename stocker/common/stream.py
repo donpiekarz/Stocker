@@ -33,7 +33,7 @@ class Stream:
         pass
 
     def save(self, filename_out):
-        self.history.sort(key=lambda event: event.order.expiration_date)
+        self.history.sort(key=lambda event: event.timestamp)
         with open(filename_out, 'w') as f:
             cPickle.dump(self, f)
 
