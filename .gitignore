@@ -1,7 +1,12 @@
 
 # python
 *.pyc
+
+# aptana
 .project
 .pydevproject
+
+# PyCharm
+.idea
 
 
