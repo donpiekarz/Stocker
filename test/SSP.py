@@ -1,7 +1,6 @@
 
 import unittest
 import tempfile
-import os
 import datetime
 
 from xml.dom import minidom 
@@ -12,7 +11,7 @@ from stocker.common.orders import OrderBuy, OrderSell
 
 from stocker.SSP.stock import Stock
 from stocker.SSP.stockbroker import Stockbroker
-from stocker.SSP.investor import DummyInvestor, Investor
+from stocker.SSP.investors.base_investor import DummyInvestor, BaseInvestor
 
 
 XML1 = """\
@@ -21,7 +20,7 @@ XML1 = """\
         <stream>%s</stream>
         <Stockbroker>
             <provision>0.38</provision>
-            <Investor module="stocker.SSP.investor" class="DummyInvestor">
+            <Investor module="stocker.SSP.investors.base_investor" class="DummyInvestor">
                 <cash type="int">1000</cash>
             </Investor>
         </Stockbroker>
@@ -72,7 +71,7 @@ class StockTestCase(unittest.TestCase):
 
         
 class StockbrokerTestCase(unittest.TestCase):
-    class MyInvestor(Investor):
+    class MyInvestor(BaseInvestor):
         event = None
         def process(self, event):
             self.event = event

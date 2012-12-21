@@ -2,7 +2,7 @@
 import sys
 import __builtin__
 
-class Investor(object):
+class BaseInvestor(object):
     stockbroker = None
     
     def __init__(self, stockbroker):
@@ -24,7 +24,7 @@ class Investor(object):
         return investor
         
 
-class DummyInvestor(Investor):
+class DummyInvestor(BaseInvestor):
 
     def process(self, event):
         print event

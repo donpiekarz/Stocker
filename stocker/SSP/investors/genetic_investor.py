@@ -2,7 +2,7 @@
 import collections
 
 from stocker.common.events import EventStockOpen, EventStockClose, EventStockTransaction
-from stocker.SSP.investor import Investor
+from stocker.SSP.investors.base_investor import BaseInvestor
 
 class GA( object ):
     def __init__(self, min_price_list, max_price_list, last_price_list, volume_list):
@@ -17,7 +17,7 @@ class GA( object ):
         print last_price_list
         print volume_list
 
-class GeneticInvestor( Investor ):
+class GeneticInvestor( BaseInvestor ):
     MAX_INT = 100000
     
     learning = 0

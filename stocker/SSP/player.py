@@ -1,10 +1,6 @@
-
-import os
-import sys
-from xml.dom import minidom 
+from xml.dom import minidom
 
 from stocker.SSP.stock import Stock
-from stocker.SSP.investor import DummyInvestor 
 
 class Player ( object ):
     

@@ -3,7 +3,7 @@ import collections
 from stocker.common.orders import OrderBuy, OrderSell
 from stocker.common.events import EventStockTransaction
 
-from stocker.SSP.investor import Investor
+from stocker.SSP.investors.base_investor import BaseInvestor
 
 class Account(object):
     cash = 0
@@ -26,7 +26,7 @@ class Stockbroker(object):
         stockbroker = Stockbroker(stock)
 
         for inv_tree in stockbroker_tree.getElementsByTagName("Investor"):
-            inv = Investor.create_from_config(stockbroker, inv_tree)
+            inv = BaseInvestor.create_from_config(stockbroker, inv_tree)
 
             stockbroker.investors.append(inv)
             stockbroker.accounts[inv] = Account()
