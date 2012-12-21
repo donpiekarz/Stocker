@@ -5,16 +5,17 @@ import __builtin__
 class BaseInvestor(object):
     stockbroker = None
     
-    def __init__(self, stockbroker):
+    def __init__(self, stockbroker, account):
         self.stockbroker = stockbroker
+        self.account = account
         
     @staticmethod
-    def create_from_config(stockbroker, investor_tree):
+    def create_from_config(stockbroker, account, investor_tree):
         module_name = investor_tree.getAttribute("module")
         __import__(module_name)
         module = sys.modules[module_name]
         inv_class = getattr(module, investor_tree.getAttribute("class"))
-        investor = inv_class(stockbroker)
+        investor = inv_class(stockbroker, account)
         
         for element in investor_tree.childNodes:
             if element.nodeType == element.ELEMENT_NODE:

@@ -10,7 +10,7 @@ from stocker.common.events import EventStreamNew, EventStockTransaction
 from stocker.common.orders import OrderBuy, OrderSell
 
 from stocker.SSP.stock import Stock
-from stocker.SSP.stockbroker import Stockbroker
+from stocker.SSP.stockbroker import Stockbroker, Account
 from stocker.SSP.investors.base_investor import DummyInvestor, BaseInvestor
 
 
@@ -85,8 +85,9 @@ class StockbrokerTestCase(unittest.TestCase):
     def setUp(self):
         self.stock = self.MyStock() 
         self.stockbroker = Stockbroker(self.stock)
-        self.investor = self.MyInvestor(self.stockbroker)
-        self.stockbroker.add_investor(self.investor)
+        self.account = Account()
+        self.investor = self.MyInvestor(self.stockbroker, self.account)
+        self.stockbroker.add_investor(self.investor, self.account)
         
         self.now = datetime.datetime.now()
         

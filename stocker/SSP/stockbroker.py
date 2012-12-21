@@ -26,10 +26,11 @@ class Stockbroker(object):
         stockbroker = Stockbroker(stock)
 
         for inv_tree in stockbroker_tree.getElementsByTagName("Investor"):
-            inv = BaseInvestor.create_from_config(stockbroker, inv_tree)
+            account = Account()
+            inv = BaseInvestor.create_from_config(stockbroker, account, inv_tree)
 
             stockbroker.investors.append(inv)
-            stockbroker.accounts[inv] = Account()
+            stockbroker.accounts[inv] = account
 
         return stockbroker
 
@@ -95,9 +96,9 @@ class Stockbroker(object):
         order.investor.process(event)
 
 
-    def add_investor(self, investor):
+    def add_investor(self, investor, account):
         self.investors.append(investor)
-        self.accounts[investor] = Account()
+        self.accounts[investor] = account
 
     def transfer_cash(self, owner, cash):
         self.accounts[owner].cash += cash
