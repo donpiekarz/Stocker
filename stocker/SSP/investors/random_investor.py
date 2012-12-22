@@ -39,12 +39,12 @@ class RandomInvestor(BaseInvestor):
 
     def __process_sell_order(self, order):
         """Responds on sell orders"""
-        if self.account.cash < order.limit_price:
+
+        if self.account.cash < order.amount * order.limit_price:
             # we dont have enough money
             return
 
-        amount = int(self.account.cash / order.limit_price)
-        new_order = OrderBuy(order.company_id, amount, order.limit_price, order.expiration_date)
+        new_order = OrderBuy(order.company_id, order.amount, order.limit_price, order.expiration_date)
         self.stockbroker.new_order(new_order, self)
 
 
