@@ -11,8 +11,10 @@ class Stock(object):
     stream = None
     stockbrokers = []
     companies = collections.defaultdict(dict)
+    stats = {}
 
     def __init__(self):
+        self.stats['events'] = 0
         pass
 
     @staticmethod
@@ -26,6 +28,11 @@ class Stock(object):
             stock.stockbrokers.append(sb)
 
         return stock
+
+    def print_summary(self):
+        print "Stock summary:"
+        print "Proceeded events: %d" % self.stats['events']
+        print "================================================================================"
 
     def new_order(self, order, stockbroker):
         order.stockbroker = stockbroker
@@ -59,6 +66,7 @@ class Stock(object):
 
     def simulate(self):
         for event in self.stream.next_event():
+            self.stats['events'] += 1
             if isinstance(event, (EventStockOpen, EventStockClose)):
                 for sb in self.stockbrokers:
                     sb.process(event)

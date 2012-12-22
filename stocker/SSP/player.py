@@ -18,8 +18,12 @@ class Player(object):
         stop_time = datetime.datetime.now()
 
         # summary
-        print "End of simulation!"
+        print "================================================================================"
+        print "Player summary:"
         print "Simulation lasted: %s" % (stop_time - start_time)
+        print "================================================================================"
+
+        stock.print_summary()
 
 
 if __name__ == "__main__":
