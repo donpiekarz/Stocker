@@ -74,25 +74,30 @@ class Stockbroker(object):
 
     def process_transaction(self, event):
         if hasattr(event.buy_order, 'investor') and event.buy_order.investor:
-            order = event.buy_order
-        elif hasattr(event.sell_order, 'investor') and event.sell_order.investor:
-            order = event.sell_order
-        else:
-            return
+            self.__process_transaction_buy(event)
 
+        if hasattr(event.sell_order, 'investor') and event.sell_order.investor:
+            self.__process_transaction_sell(event)
+
+    def __process_transaction_buy(self, event):
+        order = event.buy_order
         account = order.investor.account
         value = order.amount * order.limit_price
 
-        if isinstance(order, OrderBuy):
-            account.cash_blocked -= value
-            account.shares[order.company_id] += order.amount
-
-        elif isinstance(order, OrderSell):
-            account.cash += value
-            account.shares_blocked[order.company_id] -= order.amount
+        account.cash_blocked -= value
+        account.shares[order.company_id] += order.amount
 
         order.investor.process(event)
 
+    def __process_transaction_sell(self, event):
+        order = event.sell_order
+        account = order.investor.account
+        value = order.amount * order.limit_price
+
+        account.cash += value
+        account.shares_blocked[order.company_id] -= order.amount
+
+        order.investor.process(event)
 
     def add_investor(self, investor):
         self.investors.append(investor)
