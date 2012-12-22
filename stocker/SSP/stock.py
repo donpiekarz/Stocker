@@ -38,6 +38,7 @@ class Stock(object):
             sb.print_summary()
 
     def new_order(self, order, stockbroker):
+        #print stockbroker, order
         order.stockbroker = stockbroker
 
         if not self.companies[order.company_id]:
@@ -91,17 +92,25 @@ class Stock(object):
             buy_list = self.companies[key]['buy']
             sell_list = self.companies[key]['sell']
 
-            sell_list.sort(key=lambda order: order.limit_price)
-            buy_list.sort(key=lambda order: order.limit_price, reverse=True)
+            sell_list.sort(key=lambda order: (order.limit_price, order.stockbroker))
+            buy_list.sort(key=lambda order: (order.limit_price, order.stockbroker), reverse=True)
 
             while len(buy_list) > 0 and len(sell_list) > 0:
-                if buy_list[0].limit_price >= sell_list[0].limit_price:
-                    buy_order = buy_list.pop(0)
-                    sell_order = sell_list.pop(0)
+                buy_order = buy_list[0]
+                sell_order = sell_list[0]
 
+                if buy_order.limit_price >= sell_order.limit_price:
                     if buy_order.limit_price != sell_order.limit_price or buy_order.amount != sell_order.amount:
                         raise NotImplementedError(
                             "buy and sell order should be equal (%s != %s)" % (buy_order, sell_order))
+
+                    if buy_order.stockbroker is None and sell_order.stockbroker is None:
+                        buy_list.pop(0)
+                        sell_list.pop(0)
+                    elif buy_order.stockbroker:
+                        buy_list.pop(0)
+                    elif sell_order.stockbroker:
+                        sell_list.pop(0)
 
                     event_list.append(EventStockTransaction(1, buy_order, sell_order))
                 else:
