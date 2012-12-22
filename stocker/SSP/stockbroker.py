@@ -86,6 +86,7 @@ class Stockbroker(object):
         self.investors.append(investor)
 
     def transfer_cash(self, owner, cash):
+        owner.account.total_cash += cash
         owner.account.cash += cash
 
     class NotEnoughCashError(Exception):
