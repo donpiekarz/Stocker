@@ -1,11 +1,10 @@
-from math import floor
 import random
 
 from stocker.SSP.investors.base_investor import BaseInvestor
 from stocker.common.events import EventStockOrderNew, EventStockTransaction
 from stocker.common.orders import OrderBuy, OrderSell
 
-class RandomInvestor( BaseInvestor ):
+class RandomInvestor(BaseInvestor):
     transfer_cash = 1000
     buy_threshold = 0.5
     sell_threshold = 0.5
@@ -13,8 +12,8 @@ class RandomInvestor( BaseInvestor ):
     def process(self, event):
         if isinstance(event, EventStockOrderNew):
             order = event.order
-            if isinstance(order, OrderBuy) and random.random() > self.sell_threshold: self.process_buy(order)
-            elif isinstance(order, OrderSell) and random.random() > self.buy_threshold: self.process_sell(order)
+            if isinstance(order, OrderBuy) and random.random() > self.sell_threshold: self.__process_buy_order(order)
+            elif isinstance(order, OrderSell) and random.random() > self.buy_threshold: self.__process_sell_order(order)
 
         elif isinstance(event, EventStockTransaction):
             if hasattr(event.buy_order, 'investor') and event.buy_order.investor == self:
@@ -25,7 +24,7 @@ class RandomInvestor( BaseInvestor ):
                 #print "sold!", event.sell_order
                 pass
 
-    def process_buy(self, order):
+    def __process_buy_order(self, order):
         """Responds on buy orders"""
 
         if not self.account.shares[order.company_id] > order.amount:
@@ -35,7 +34,7 @@ class RandomInvestor( BaseInvestor ):
         new_order = OrderSell(order.company_id, order.amount, order.limit_price, order.expiration_date)
         self.stockbroker.new_order(new_order, self)
 
-    def process_sell(self, order):
+    def __process_sell_order(self, order):
         """Responds on sell orders"""
         if self.account.cash < order.limit_price:
             self.stockbroker.transfer_cash(self, self.transfer_cash)
