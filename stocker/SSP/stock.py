@@ -99,6 +99,10 @@ class Stock(object):
                     buy_order = buy_list.pop(0)
                     sell_order = sell_list.pop(0)
 
+                    if buy_order.limit_price != sell_order.limit_price or buy_order.amount != sell_order.amount:
+                        raise NotImplementedError(
+                            "buy and sell order should be equal (%s != %s)" % (buy_order, sell_order))
+
                     event_list.append(EventStockTransaction(1, buy_order, sell_order))
                 else:
                     break
