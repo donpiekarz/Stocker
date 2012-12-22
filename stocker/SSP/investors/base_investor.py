@@ -3,6 +3,7 @@ import sys
 import __builtin__
 
 class Account(object):
+    total_cash = 0
     cash = 0
     cash_blocked = 0
     shares = collections.defaultdict(int)
@@ -11,13 +12,16 @@ class Account(object):
 
 class BaseInvestor(object):
     stockbroker = None
+    account = None
+    report = None
 
     def __init__(self, stockbroker):
         self.stockbroker = stockbroker
         self.account = Account()
+        self.report = InvestorReport()
 
     def prepare(self):
-        """Prepare investor to simulation"""
+        """Prepare investor for simulation"""
         pass
 
     def process(self, event):
@@ -38,6 +42,10 @@ class BaseInvestor(object):
 
         investor.prepare()
         return investor
+
+
+class InvestorReport(object):
+    pass
 
 
 class DummyInvestor(BaseInvestor):
