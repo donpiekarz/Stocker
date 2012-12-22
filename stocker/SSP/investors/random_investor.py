@@ -9,6 +9,9 @@ class RandomInvestor(BaseInvestor):
     buy_threshold = 0.5
     sell_threshold = 0.5
 
+    def prepare(self):
+        self.stockbroker.transfer_cash(self, self.transfer_cash)
+
     def process(self, event):
         if isinstance(event, EventStockOrderNew):
             order = event.order
@@ -37,7 +40,8 @@ class RandomInvestor(BaseInvestor):
     def __process_sell_order(self, order):
         """Responds on sell orders"""
         if self.account.cash < order.limit_price:
-            self.stockbroker.transfer_cash(self, self.transfer_cash)
+            # we dont have enough money
+            return
 
         amount = int(self.account.cash / order.limit_price)
         new_order = OrderBuy(order.company_id, amount, order.limit_price, order.expiration_date)
