@@ -1,12 +1,20 @@
+import collections
 import sys
 import __builtin__
+
+class Account(object):
+    cash = 0
+    cash_blocked = 0
+    shares = collections.defaultdict(int)
+    shares_blocked = collections.defaultdict(int)
+
 
 class BaseInvestor(object):
     stockbroker = None
 
-    def __init__(self, stockbroker, account):
+    def __init__(self, stockbroker):
         self.stockbroker = stockbroker
-        self.account = account
+        self.account = Account()
 
     def prepare(self):
         """Prepare investor to simulation"""
@@ -16,12 +24,12 @@ class BaseInvestor(object):
         raise NotImplementedError("Abstract method")
 
     @staticmethod
-    def create_from_config(stockbroker, account, investor_tree):
+    def create_from_config(stockbroker, investor_tree):
         module_name = investor_tree.getAttribute("module")
         __import__(module_name)
         module = sys.modules[module_name]
         inv_class = getattr(module, investor_tree.getAttribute("class"))
-        investor = inv_class(stockbroker, account)
+        investor = inv_class(stockbroker)
 
         for element in investor_tree.childNodes:
             if element.nodeType == element.ELEMENT_NODE:

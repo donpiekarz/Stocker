@@ -1,22 +1,11 @@
-import collections
-
 from stocker.common.orders import OrderBuy, OrderSell
 from stocker.common.events import EventStockTransaction
 
 from stocker.SSP.investors.base_investor import BaseInvestor
 
-class Account(object):
-    cash = 0
-    cash_blocked = 0
-    shares = collections.defaultdict(int)
-    shares_blocked = collections.defaultdict(int)
-
-
 class Stockbroker(object):
     stock = None
     investors = []
-    accounts = {}
-    orders = {}
 
     def __init__(self, stock):
         self.stock = stock
@@ -26,18 +15,15 @@ class Stockbroker(object):
         stockbroker = Stockbroker(stock)
 
         for inv_tree in stockbroker_tree.getElementsByTagName("Investor"):
-            account = Account()
-            inv = BaseInvestor.create_from_config(stockbroker, account, inv_tree)
-
+            inv = BaseInvestor.create_from_config(stockbroker, inv_tree)
             stockbroker.investors.append(inv)
-            stockbroker.accounts[inv] = account
 
         return stockbroker
 
     def new_order(self, order, investor):
         order.investor = investor
 
-        account = self.accounts[order.investor]
+        account = order.investor.account
 
         if isinstance(order, OrderBuy):
             value = order.amount * order.limit_price
@@ -82,7 +68,7 @@ class Stockbroker(object):
         else:
             return
 
-        account = self.accounts[order.investor]
+        account = order.investor.account
         value = order.amount * order.limit_price
 
         if isinstance(order, OrderBuy):
@@ -96,12 +82,11 @@ class Stockbroker(object):
         order.investor.process(event)
 
 
-    def add_investor(self, investor, account):
+    def add_investor(self, investor):
         self.investors.append(investor)
-        self.accounts[investor] = account
 
     def transfer_cash(self, owner, cash):
-        self.accounts[owner].cash += cash
+        owner.account.cash += cash
 
     class NotEnoughCashError(Exception):
         pass
