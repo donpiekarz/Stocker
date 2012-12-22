@@ -6,9 +6,12 @@ from stocker.SSP.investors.base_investor import BaseInvestor
 class Stockbroker(object):
     stock = None
     investors = []
+    stats = {}
 
     def __init__(self, stock):
         self.stock = stock
+
+        self.stats['orders'] = 0
 
     @staticmethod
     def create_from_config(stock, stockbroker_tree):
@@ -20,7 +23,16 @@ class Stockbroker(object):
 
         return stockbroker
 
+    def print_summary(self):
+        print "Stockbroker summary:"
+        print "Placed orders: %d" % self.stats['orders']
+        print "================================================================================"
+
+        for inv in self.investors:
+            inv.account.print_summary()
+
     def new_order(self, order, investor):
+        self.stats['orders'] += 1
         order.investor = investor
 
         account = order.investor.account

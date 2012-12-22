@@ -9,6 +9,15 @@ class Account(object):
     shares = collections.defaultdict(int)
     shares_blocked = collections.defaultdict(int)
 
+    def print_summary(self):
+        print "Account summary:"
+        print "Total transfered cash: %.2f" % self.total_cash
+        print "Current cash: %.2f" % self.cash
+        print "Cash blocked: %.2f" % self.cash_blocked
+        print "Shares: %s" % ["%s: %d" % (k, v) for k, v in self.shares.iteritems()]
+        print "Shares blocked: %s" % ["%s: %d" % (k, v) for k, v in self.shares_blocked.iteritems()]
+        print "================================================================================"
+
 
 class BaseInvestor(object):
     stockbroker = None

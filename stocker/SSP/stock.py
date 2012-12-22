@@ -34,6 +34,9 @@ class Stock(object):
         print "Proceeded events: %d" % self.stats['events']
         print "================================================================================"
 
+        for sb in self.stockbrokers:
+            sb.print_summary()
+
     def new_order(self, order, stockbroker):
         order.stockbroker = stockbroker
 
