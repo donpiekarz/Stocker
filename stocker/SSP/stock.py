@@ -8,7 +8,7 @@ from stocker.SSP.stockbroker import Stockbroker
 
 
 class Stock(object):
-    stream = None
+    stream_file = None
     stockbrokers = []
     companies = collections.defaultdict(dict)
     stats = {}
@@ -21,7 +21,7 @@ class Stock(object):
     def create_from_config(stock_tree):
         stock = Stock()
 
-        stock.stream = Stream.load(stock_tree.getElementsByTagName("stream")[0].firstChild.nodeValue)
+        stock.stream_file = stock_tree.getElementsByTagName("stream")[0].firstChild.nodeValue
 
         for sb_tree in stock_tree.getElementsByTagName("Stockbroker"):
             sb = Stockbroker.create_from_config(stock, sb_tree)
@@ -69,7 +69,7 @@ class Stock(object):
         pass
 
     def simulate(self):
-        for event in self.stream.next_event():
+        for event in Stream.next_event(self.stream_file):
             self.stats['events'] += 1
             if isinstance(event, (EventStockOpen, EventStockClose)):
                 for sb in self.stockbrokers:

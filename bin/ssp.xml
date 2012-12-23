@@ -1,14 +1,13 @@
-
 <Player>
-	<Stock>
-		<stream>C:\code\stocker_data\small\small.stm</stream>
-		<Stockbroker>
-			<provision>0.38</provision>
-			<Investor module="stocker.SSP.investors.genetic_investor" class="GeneticInvestor">
-				<cash type="int">1000</cash>
-				<learning type="int">25</learning>
-			</Investor>
-		</Stockbroker>
-	</Stock>
-	
+    <Stock>
+        <stream>C:\code\stocker_data\small\small.stm</stream>
+        <Stockbroker>
+            <provision>0.38</provision>
+            <Investor module="stocker.SSP.investors.random_investor" class="RandomInvestor">
+                <cash type="int">1000</cash>
+                <learning type="int">25</learning>
+            </Investor>
+        </Stockbroker>
+    </Stock>
+
 </Player>

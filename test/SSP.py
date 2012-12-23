@@ -33,13 +33,15 @@ class StockTestCase(unittest.TestCase):
     def setUp(self):
         self.now = datetime.datetime.now()
         self.stream = Stream()
-        self.stream.history.append(EventStreamNew(self.now, OrderBuy("CIA", 10, 21.34,
-            datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
-        self.stream.history.append(EventStreamNew(self.now, OrderSell("CIA", 10, 21.34,
-            datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
 
         self.stream_file = tempfile.mkstemp()[1]
-        self.stream.save(self.stream_file)
+        self.stream.begin(self.stream_file)
+        self.stream.add_event(EventStreamNew(self.now, OrderBuy("CIA", 10, 21.34,
+            datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
+        self.stream.add_event(EventStreamNew(self.now, OrderSell("CIA", 10, 21.34,
+            datetime.datetime.strptime("%s %s" % ("2012-11-24", "09:39:01"), "%Y-%m-%d %H:%M:%S"))))
+        self.stream.end()
+
         self.xml1 = XML1 % self.stream_file
 
 
@@ -55,8 +57,7 @@ class StockTestCase(unittest.TestCase):
         stock = Stock.create_from_config(stock_tree)
 
         self.assertIsNotNone(stock)
-        self.assertIsInstance(stock.stream, Stream)
-        self.assertEqual(len(stock.stream.history), 4)
+        self.assertIsNotNone(stock.stream_file)
         self.assertEqual(len(stock.stockbrokers), 1)
         self.assertIsNotNone(stock.stockbrokers[0])
         self.assertEqual(len(stock.stockbrokers[0].investors), 1)
