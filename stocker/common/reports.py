@@ -1,4 +1,4 @@
-from stocker.common.events import Event
+from stocker.common.events import EventInvestorReportOrderPlaced, EventInvestorReportOrderRealized, EventInvestorReportCashTransferred
 from stocker.common.utils import Stream
 
 class Report(object):
@@ -13,30 +13,14 @@ class InvestorReport(Report):
         self.__stream.begin(filename)
 
     def order_placed(self, order):
-        self.__stream.add_event(InvestorReport.OrderPlaced(self.__now(), order))
+        self.__stream.add_event(EventInvestorReportOrderPlaced(self.__now(), order))
 
     def order_realized(self, order):
-        self.__stream.add_event(InvestorReport.OrderRealized(self.__now(), order))
+        self.__stream.add_event(EventInvestorReportOrderRealized(self.__now(), order))
 
     def cash_transferred(self, cash):
-        self.__stream.add_event(InvestorReport.CashTransferred(self.__now(), cash))
+        self.__stream.add_event(EventInvestorReportCashTransferred(self.__now(), cash))
 
     def __now(self):
         return 1
-
-    class OrderPlaced(Event):
-        def __init__(self, timestamp, order):
-            self.timestamp = timestamp
-            self.order = order
-
-    class OrderRealized(Event):
-        def __init__(self, timestamp, order):
-            self.timestamp = timestamp
-            self.order = order
-
-    class CashTransferred(Event):
-        def __init__(self, timestamp, cash):
-            self.timestamp = timestamp
-            self.order = cash
-
 

@@ -20,6 +20,13 @@ class Order(object):
                    self.expiration_date
                    )
 
+    def __getstate__(self):
+        odict = self.__dict__.copy()
+        # prevent serializing investor and stockbroker
+        del odict['investor']
+        del odict['stockbroker']
+        return odict
+
 
 class OrderBuy(Order):
     def __init__(self, company_id, amount, limit_price, expiration_date):

@@ -46,6 +46,7 @@ class Stockbroker(object):
             account.cash_blocked += value
 
             self.stock.new_order(order, self)
+            investor.report.order_placed(order)
 
         elif isinstance(order, OrderSell):
             if account.shares[order.company_id] < order.amount:
@@ -55,6 +56,7 @@ class Stockbroker(object):
             account.shares_blocked[order.company_id] += order.amount
 
             self.stock.new_order(order, self)
+            investor.report.order_placed(order)
 
 
     def del_order(self, order):
@@ -81,6 +83,7 @@ class Stockbroker(object):
 
     def __process_transaction_buy(self, event):
         order = event.buy_order
+        order.investor.report.order_realized(order)
         account = order.investor.account
         value = order.amount * order.limit_price
 
@@ -91,6 +94,7 @@ class Stockbroker(object):
 
     def __process_transaction_sell(self, event):
         order = event.sell_order
+        order.investor.report.order_realized(order)
         account = order.investor.account
         value = order.amount * order.limit_price
 
@@ -105,6 +109,7 @@ class Stockbroker(object):
     def transfer_cash(self, owner, cash):
         owner.account.total_cash += cash
         owner.account.cash += cash
+        owner.report.cash_transferred(cash)
 
     class NotEnoughCashError(Exception):
         pass
