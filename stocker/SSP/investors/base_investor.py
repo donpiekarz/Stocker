@@ -2,6 +2,8 @@ import collections
 import sys
 import __builtin__
 
+from stocker.common.reports import InvestorReport
+
 class Account(object):
     total_cash = 0
     cash = 0
@@ -51,10 +53,6 @@ class BaseInvestor(object):
 
         investor.prepare()
         return investor
-
-
-class InvestorReport(object):
-    pass
 
 
 class DummyInvestor(BaseInvestor):
