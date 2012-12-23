@@ -3,6 +3,7 @@ import sys
 import __builtin__
 
 from stocker.common.reports import InvestorReport
+from stocker.common.utils import Null
 
 class Account(object):
     total_cash = 0
@@ -29,7 +30,7 @@ class BaseInvestor(object):
     def __init__(self, stockbroker):
         self.stockbroker = stockbroker
         self.account = Account()
-        self.report = InvestorReport()
+        self.report = Null()
 
     def prepare(self):
         """Prepare investor for simulation"""
@@ -50,6 +51,11 @@ class BaseInvestor(object):
             if element.nodeType == element.ELEMENT_NODE:
                 element_type = getattr(__builtin__, element.getAttribute("type"))
                 setattr(investor, element.nodeName, element_type(element.firstChild.nodeValue))
+
+        if hasattr(investor, 'report_path'):
+            investor.report = InvestorReport(investor.report_path)
+        else:
+            print "WARRING: Report file will NOT be produced (missing attribute: report_path)"
 
         investor.prepare()
         return investor

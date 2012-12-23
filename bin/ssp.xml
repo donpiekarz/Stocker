@@ -6,6 +6,7 @@
             <Investor module="stocker.SSP.investors.random_investor" class="RandomInvestor">
                 <cash type="int">1000</cash>
                 <learning type="int">25</learning>
+                <report_path type="str">c:\code\stocker_data\inv1.stm</report_path>
             </Investor>
         </Stockbroker>
     </Stock>
