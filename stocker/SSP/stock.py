@@ -1,6 +1,6 @@
 import collections
 
-from stocker.common.stream import Stream
+from stocker.common.utils import Stream
 from stocker.common.orders import OrderBuy, OrderSell
 from stocker.common.events import EventStreamNew, EventStockOrderNew, EventStockTransaction, EventStockOpen, EventStockClose
 

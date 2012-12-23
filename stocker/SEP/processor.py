@@ -5,7 +5,7 @@ import datetime
 
 from stocker.common.events import EventStreamNew, EventStockOpen, EventStockClose
 from stocker.common.orders import OrderBuy, OrderSell
-from stocker.common.stream import Stream
+from stocker.common.utils import Stream
 
 class Processor(object):
     def build_stream(self, dirname_in, filename_out):

@@ -4,7 +4,7 @@ import datetime
 
 from xml.dom import minidom
 
-from stocker.common.stream import Stream
+from stocker.common.utils import Stream
 from stocker.common.events import EventStreamNew, EventStockTransaction
 from stocker.common.orders import OrderBuy, OrderSell
 
