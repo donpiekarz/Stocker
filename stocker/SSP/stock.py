@@ -21,7 +21,7 @@ class Stock(object):
     def create_from_config(stock_tree):
         stock = Stock()
 
-        stock.stream_file = stock_tree.getElementsByTagName("stream")[0].firstChild.nodeValue
+        stock.stream_file = stock_tree.getElementsByTagName("stream_path")[0].firstChild.nodeValue
 
         for sb_tree in stock_tree.getElementsByTagName("Stockbroker"):
             sb = Stockbroker.create_from_config(stock, sb_tree)

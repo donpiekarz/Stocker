@@ -16,7 +16,7 @@ from stocker.SSP.investors.base_investor import DummyInvestor, BaseInvestor
 XML1 = """\
 <Player>
     <Stock>
-        <stream>%s</stream>
+        <stream_path>%s</stream_path>
         <Stockbroker>
             <provision>0.38</provision>
             <Investor module="stocker.SSP.investors.base_investor" class="DummyInvestor">

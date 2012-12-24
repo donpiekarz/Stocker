@@ -1,6 +1,6 @@
 <Player>
     <Stock>
-        <stream>C:\code\stocker_data\small\small.stm</stream>
+        <stream_path>C:\code\stocker_data\small\small.stm</stream_path>
         <Stockbroker>
             <provision>0.38</provision>
             <Investor module="stocker.SSP.investors.random_investor" class="RandomInvestor">
