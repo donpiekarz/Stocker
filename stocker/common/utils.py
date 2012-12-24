@@ -1,4 +1,5 @@
 import cPickle
+import datetime
 
 class Stream(object):
     @staticmethod
@@ -18,6 +19,25 @@ class Stream(object):
 
     def add_event(self, event):
         cPickle.dump(event, self.f, cPickle.HIGHEST_PROTOCOL)
+
+
+class Clock(object):
+    current_time = None
+
+    @staticmethod
+    def now():
+        delta = datetime.timedelta(microseconds=1)
+        Clock.current_time += delta
+        return Clock.current_time
+
+    @staticmethod
+    def start_from(timestamp):
+        delta = datetime.timedelta(seconds=1)
+        Clock.current_time = timestamp - delta
+
+    @staticmethod
+    def set_now(timestamp):
+        Clock.current_time = timestamp
 
 # source: http://code.activestate.com/recipes/68205-null-object-design-pattern/
 class Null:

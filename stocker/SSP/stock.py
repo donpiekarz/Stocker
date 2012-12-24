@@ -1,6 +1,6 @@
 import collections
 
-from stocker.common.utils import Stream
+from stocker.common.utils import Stream, Clock
 from stocker.common.orders import OrderBuy, OrderSell
 from stocker.common.events import EventStreamNew, EventStockOrderNew, EventStockTransaction, EventStockOpen, EventStockClose
 
@@ -22,6 +22,9 @@ class Stock(object):
         stock = Stock()
 
         stock.stream_file = stock_tree.getElementsByTagName("stream_path")[0].firstChild.nodeValue
+
+        # init clock
+        Clock.start_from(Stream.next_event(stock.stream_file).next().timestamp)
 
         for sb_tree in stock_tree.getElementsByTagName("Stockbroker"):
             sb = Stockbroker.create_from_config(stock, sb_tree)
@@ -70,6 +73,7 @@ class Stock(object):
 
     def simulate(self):
         for event in Stream.next_event(self.stream_file):
+            Clock.set_now(event.timestamp)
             self.stats['events'] += 1
             if isinstance(event, (EventStockOpen, EventStockClose)):
                 for sb in self.stockbrokers:

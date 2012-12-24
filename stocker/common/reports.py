@@ -1,5 +1,5 @@
 from stocker.common.events import EventInvestorReportOrderPlaced, EventInvestorReportOrderRealized, EventInvestorReportCashTransferred
-from stocker.common.utils import Stream
+from stocker.common.utils import Stream, Clock
 
 class Report(object):
     pass
@@ -22,5 +22,5 @@ class InvestorReport(Report):
         self.__stream.add_event(EventInvestorReportCashTransferred(self.__now(), cash))
 
     def __now(self):
-        return 1
+        return Clock.now()
 
