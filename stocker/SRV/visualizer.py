@@ -1,22 +1,28 @@
 import matplotlib.pyplot as plt
 
-from stocker.SRV.plotters.volume_price_plotter import VolumePricePlotter
 from stocker.common.utils import Stream
 
 class Visualizer(object):
     @staticmethod
-    def main(reports):
-        report = reports[0]
+    def __import_plotter(name):
+        (modulename, classname) = name.rsplit('.', 1)
 
-        plotter = VolumePricePlotter()
+        mod = __import__(modulename, fromlist=[classname])
+        cl = getattr(mod, classname)
 
-        for event in Stream.next_event(report):
+        return cl
+
+    @staticmethod
+    def main(filename, plotter_str):
+        plotter_class = Visualizer.__import_plotter(plotter_str)
+
+        plotter = plotter_class()
+
+        for event in Stream.next_event(filename):
             plotter.process(event)
 
         fig = plt.figure()
-
         plotter.draw_plot(fig)
-
         plt.show()
 
 
