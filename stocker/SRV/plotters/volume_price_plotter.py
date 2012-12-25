@@ -37,5 +37,10 @@ class VolumePricePlotter(BasePlotter):
         ax.scatter(self.x_list, self.y_list, c=self.c_list, s=self.s_list)
         ax.xaxis_date()
         ax.grid(True)
+
+        ob = mpl.patches.Circle((0, 0), fc="r")
+        os = mpl.patches.Circle((0, 0), fc="b")
+        ax.legend([ob, os], ["Order Buy", "Order Sell"], loc=2)
+
         fig.autofmt_xdate()
 
