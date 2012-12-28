@@ -35,20 +35,23 @@ class Processor(object):
 
         with open(filename_in, 'r') as f:
             for row in reversed(list(csv.reader(f, delimiter=';'))):
-                #print row
-                try:
-                    desc = row[5]
-                    if desc.startswith('TRANSAKCJA'):
-                        amount = int(row[3])
-                        limit_price = decimal.Decimal(row[1].replace(',', '.'))
-                        timestamp = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
-                        expiration_date = timestamp + datetime.timedelta(days=1)
-                        self.stream.add_event(
-                            EventStreamNew(timestamp, OrderBuy(company_id, amount, limit_price, expiration_date)))
-                        self.stream.add_event(
-                            EventStreamNew(timestamp, OrderSell(company_id, amount, limit_price, expiration_date)))
-                except IndexError:
-                    pass
+                self.__process_row(row, date, company_id)
 
         self.stream.add_event(EventStockClose(
             datetime.datetime.combine(datetime.datetime.strptime(date, "%Y-%m-%d"), datetime.time(18, 0))))
+
+    def __process_row(self, row, date, company_id):
+        #print row
+        try:
+            desc = row[5]
+            if desc.startswith('TRANSAKCJA'):
+                amount = int(row[3])
+                limit_price = decimal.Decimal(row[1].replace(',', '.'))
+                timestamp = datetime.datetime.strptime("%s %s" % (date, row[0]), "%Y-%m-%d %H:%M:%S")
+                expiration_date = timestamp + datetime.timedelta(days=1)
+                self.stream.add_event(
+                    EventStreamNew(timestamp, OrderBuy(company_id, amount, limit_price, expiration_date)))
+                self.stream.add_event(
+                    EventStreamNew(timestamp, OrderSell(company_id, amount, limit_price, expiration_date)))
+        except IndexError:
+            pass
