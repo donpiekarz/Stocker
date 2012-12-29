@@ -1,6 +1,8 @@
 import collections
 import sys
 import __builtin__
+from stocker.common.events import EventStockOrderNew, EventStockTransaction
+from stocker.common.orders import OrderSell, OrderBuy
 
 from stocker.common.reports import InvestorReport
 from stocker.common.utils import Null
@@ -59,7 +61,19 @@ class BaseInvestor(object):
         pass
 
     def process(self, event):
-        raise NotImplementedError("Abstract method")
+        if isinstance(event, EventStockOrderNew):
+            if isinstance(event.order, OrderBuy):
+                self._process_order_buy(event)
+            elif isinstance(event.order, OrderSell):
+                self._process_order_sell(event)
+
+        elif isinstance(event, EventStockTransaction):
+            if hasattr(event.buy_order, 'investor') and event.buy_order.investor == self:
+                self._process_bought(event)
+            elif hasattr(event.sell_order, 'investor') and event.sell_order.investor == self:
+                self._process_sold(event)
+            else:
+                self._process_transaction(event)
 
     @staticmethod
     def create_from_config(stockbroker, investor_tree):
@@ -81,6 +95,43 @@ class BaseInvestor(object):
 
         investor.prepare()
         return investor
+
+    def _sell(self, order):
+        """Responds on buy orders"""
+
+        if self.account.shares[order.company_id] < order.amount:
+            # we dont have any shares of this company
+            return
+
+        new_order = OrderSell(order.company_id, order.amount, order.limit_price, order.expiration_date)
+        self.stockbroker.new_order(new_order, self)
+
+    def _buy(self, order):
+        """Responds on sell orders"""
+
+        if self.account.cash < order.amount * order.limit_price:
+            # we dont have enough money
+            return
+
+        new_order = OrderBuy(order.company_id, order.amount, order.limit_price, order.expiration_date)
+        self.stockbroker.new_order(new_order, self)
+
+    def _process_order_buy(self, event):
+        """process OrderBuy events"""
+        pass
+
+    def _process_order_sell(self, event):
+        """process OrderSell events"""
+        pass
+
+    def _process_transaction(self, event):
+        pass
+
+    def _process_bought(self, event):
+        pass
+
+    def _process_sold(self, event):
+        pass
 
 
 class DummyInvestor(BaseInvestor):
