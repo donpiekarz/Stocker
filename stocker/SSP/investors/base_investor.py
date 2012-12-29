@@ -12,6 +12,28 @@ class Account(object):
     shares = collections.defaultdict(int)
     shares_blocked = collections.defaultdict(int)
 
+    def bought(self, order):
+        value = order.amount * order.limit_price
+
+        self.cash_blocked -= value
+        self.shares[order.company_id] += order.amount
+
+    def sold(self, order):
+        value = order.amount * order.limit_price
+
+        self.cash += value
+        self.shares_blocked[order.company_id] -= order.amount
+
+    def block_cash(self, order):
+        value = order.amount * order.limit_price
+
+        self.cash -= value
+        self.cash_blocked += value
+
+    def block_shares(self, order):
+        self.shares[order.company_id] -= order.amount
+        self.shares_blocked[order.company_id] += order.amount
+
     def print_summary(self):
         print "Account summary:"
         print "Total transfered cash: %.2f" % self.total_cash

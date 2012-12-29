@@ -42,8 +42,7 @@ class Stockbroker(object):
             if account.cash < value:
                 raise self.NotEnoughCashError
 
-            account.cash -= value
-            account.cash_blocked += value
+            account.block_cash(order)
 
             self.stock.new_order(order, self)
             investor.report.order_placed(order)
@@ -52,8 +51,7 @@ class Stockbroker(object):
             if account.shares[order.company_id] < order.amount:
                 raise self.NotEnoughSharesError
 
-            account.shares[order.company_id] -= order.amount
-            account.shares_blocked[order.company_id] += order.amount
+            account.block_shares(order)
 
             self.stock.new_order(order, self)
             investor.report.order_placed(order)
@@ -84,22 +82,16 @@ class Stockbroker(object):
     def __process_transaction_buy(self, event):
         order = event.buy_order
         order.investor.report.order_realized(order)
-        account = order.investor.account
-        value = order.amount * order.limit_price
 
-        account.cash_blocked -= value
-        account.shares[order.company_id] += order.amount
+        order.investor.account.bought(order)
 
         order.investor.process(event)
 
     def __process_transaction_sell(self, event):
         order = event.sell_order
         order.investor.report.order_realized(order)
-        account = order.investor.account
-        value = order.amount * order.limit_price
 
-        account.cash += value
-        account.shares_blocked[order.company_id] -= order.amount
+        order.investor.account.sold(order)
 
         order.investor.process(event)
 
