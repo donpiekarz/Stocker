@@ -54,48 +54,52 @@ class Processor(object):
         dates_ordered = sorted(dates_set, key=lambda date: datetime.datetime.strptime(date, "%Y-%m-%d"))
 
         for date in dates_ordered:
-            rows = []
-            generators = [company.get_row(date) for company in companies]
+            self.__process_date(date, companies)
 
-            correct_generators = []
 
-            correct_day = False
+    def __process_date(self, date, companies):
+        rows = []
+        correct_generators = []
+        correct_day = False
 
-            for generator in generators:
-                try:
-                    row, company_id = generator.next()
-                    row = (company_id, row, generator)
-                    rows.append(row)
-                    correct_generators.append(generator)
-                except StopIteration as e:
-                    pass
+        generators = [company.get_row(date) for company in companies]
 
-            if correct_generators:
-                # correct day (have transactions)
-                correct_day = True
+        for generator in generators:
+            try:
+                row, company_id = generator.next()
+                row = (company_id, row, generator)
+                rows.append(row)
+                correct_generators.append(generator)
+            except StopIteration as e:
+                pass
 
-            if correct_day:
-                self.stream.add_event(EventStockOpen(
-                    datetime.datetime.combine(datetime.datetime.strptime(date, "%Y-%m-%d"), datetime.time(9, 0))))
+        if correct_generators:
+            # correct day (have transactions)
+            correct_day = True
 
-            while correct_generators:
-                row_data = min(rows, key=lambda row: datetime.datetime.strptime(row[1][0], "%H:%M:%S"))
-                rows.remove(row_data)
+        if correct_day:
+            self.stream.add_event(EventStockOpen(
+                datetime.datetime.combine(datetime.datetime.strptime(date, "%Y-%m-%d"), datetime.time(9, 0))))
 
-                company_id, row, generator = row_data
+        # main loop, multiplexing rows
+        while correct_generators:
+            row_data = min(rows, key=lambda row: datetime.datetime.strptime(row[1][0], "%H:%M:%S"))
+            rows.remove(row_data)
 
-                self.__process_row(row, date, company_id)
+            company_id, row, generator = row_data
 
-                try:
-                    row, company_id = generator.next()
-                    row = (company_id, row, generator)
-                    rows.append(row)
-                except StopIteration as e:
-                    correct_generators.remove(generator)
+            self.__process_row(row, date, company_id)
 
-            if correct_day:
-                self.stream.add_event(EventStockClose(
-                    datetime.datetime.combine(datetime.datetime.strptime(date, "%Y-%m-%d"), datetime.time(18, 0))))
+            try:
+                row, company_id = generator.next()
+                row = (company_id, row, generator)
+                rows.append(row)
+            except StopIteration as e:
+                correct_generators.remove(generator)
+
+        if correct_day:
+            self.stream.add_event(EventStockClose(
+                datetime.datetime.combine(datetime.datetime.strptime(date, "%Y-%m-%d"), datetime.time(18, 0))))
 
     def __process_row(self, row, date, company_id):
         amount = int(row[3])
