@@ -1,11 +1,12 @@
 <Player>
     <Stock>
-        <stream_path>C:\code\stocker_data\streams\amica_cityinter_large.stm</stream_path>
+        <stream_path>C:\code\stocker_data\streams\amica_large.stm</stream_path>
         <Stockbroker>
             <provision>0.38</provision>
-            <Investor module="stocker.SSP.investors.random_investor" class="RandomInvestor">
-                <cash type="int">1000</cash>
-                <learning type="int">25</learning>
+            <Investor module="stocker.SSP.investors.greedy_investor" class="GreedyInvestor">
+                <init_cash type="int">1000</init_cash>
+                <buy_threshold type="float">0.5</buy_threshold>
+                <roi type="float">1.05</roi>
                 <report_path type="str">c:\code\stocker_data\inv1.stm</report_path>
             </Investor>
         </Stockbroker>
