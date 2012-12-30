@@ -8,41 +8,70 @@ from stocker.common.reports import InvestorReport
 from stocker.common.utils import Null
 
 class Account(object):
-    total_cash = 0
-    cash = 0
-    cash_blocked = 0
-    shares = collections.defaultdict(int)
-    shares_blocked = collections.defaultdict(int)
+    def __init__(self):
+        self._total_cash = 0
+        self._cash = 0
+        self._cash_blocked = 0
+        self._shares = collections.defaultdict(int)
+        self._shares_blocked = collections.defaultdict(int)
+
+    @property
+    def cash( self ):
+        return self._cash
+
+    @property
+    def cash_blocked( self ):
+        return self._cash_blocked
+
+    @property
+    def shares( self ):
+        return self._shares
+
+    @property
+    def shares_blocked( self ):
+        return self._shares_blocked
+
+    def add_cash(self, cash):
+        self._total_cash += cash
+        self._cash += cash
 
     def bought(self, order):
         value = order.amount * order.limit_price
 
-        self.cash_blocked -= value
-        self.shares[order.company_id] += order.amount
+        self._cash_blocked -= value
+        self._shares[order.company_id] += order.amount
+
+        assert self._cash_blocked >= 0, "Cash blocked is less then zero!"
 
     def sold(self, order):
         value = order.amount * order.limit_price
 
-        self.cash += value
-        self.shares_blocked[order.company_id] -= order.amount
+        self._cash += value
+        self._shares_blocked[order.company_id] -= order.amount
+
+        assert self._shares_blocked[order.company_id] >= 0, "Shares blocked (%s) is less then zero!" % order.company_id
 
     def block_cash(self, order):
         value = order.amount * order.limit_price
 
-        self.cash -= value
-        self.cash_blocked += value
+        self._cash -= value
+        self._cash_blocked += value
+
+        assert self._cash >= 0, "Cash is less then zero!"
 
     def block_shares(self, order):
-        self.shares[order.company_id] -= order.amount
-        self.shares_blocked[order.company_id] += order.amount
+        self._shares[order.company_id] -= order.amount
+        self._shares_blocked[order.company_id] += order.amount
+
+        assert self._shares[order.company_id] >= 0, "Shares (%s) is less then zero!" % order.company_id
 
     def print_summary(self):
         print "Account summary:"
-        print "Total transfered cash: %.2f" % self.total_cash
-        print "Current cash: %.2f" % self.cash
-        print "Cash blocked: %.2f" % self.cash_blocked
-        print "Shares: %s" % ["%s: %d" % (k, v) for k, v in self.shares.iteritems()]
-        print "Shares blocked: %s" % ["%s: %d" % (k, v) for k, v in self.shares_blocked.iteritems()]
+        print "Total transfered cash: %.2f" % self._total_cash
+        print "Current cash: %.2f" % self._cash
+        print "Cash blocked: %.2f" % self._cash_blocked
+        print "Shares: %s" % ["%s: %d" % (k, v) for k, v in self._shares.iteritems()]
+        print "Shares blocked: %s" % ["%s: %d" % (k, v) for k, v in self._shares_blocked.iteritems()]
         print "================================================================================"
 
 
@@ -68,10 +97,11 @@ class BaseInvestor(object):
                 self._process_order_sell(event)
 
         elif isinstance(event, EventStockTransaction):
-            if hasattr(event.buy_order, 'investor') and event.buy_order.investor == self:
-                self._process_bought(event)
-            elif hasattr(event.sell_order, 'investor') and event.sell_order.investor == self:
-                self._process_sold(event)
+            if event.buy_order.investor == self or event.sell_order.investor == self:
+                if event.buy_order.investor == self:
+                    self._process_bought(event)
+                elif event.sell_order.investor == self:
+                    self._process_sold(event)
             else:
                 self._process_transaction(event)
 

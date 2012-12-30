@@ -62,8 +62,8 @@ class Stockbroker(object):
 
     def process(self, event):
         if isinstance(event, EventStockTransaction):
-            if hasattr(event.buy_order, 'investor') or hasattr(event.sell_order, 'investor'): self.process_transaction(
-                event)
+            if event.buy_order.investor or event.sell_order.investor:
+                self.process_transaction(event)
             else:
                 for inv in self.investors:
                     inv.process(event)
@@ -73,10 +73,10 @@ class Stockbroker(object):
                 inv.process(event)
 
     def process_transaction(self, event):
-        if hasattr(event.buy_order, 'investor') and event.buy_order.investor:
+        if event.buy_order.investor:
             self.__process_transaction_buy(event)
 
-        if hasattr(event.sell_order, 'investor') and event.sell_order.investor:
+        if event.sell_order.investor:
             self.__process_transaction_sell(event)
 
     def __process_transaction_buy(self, event):
@@ -99,8 +99,7 @@ class Stockbroker(object):
         self.investors.append(investor)
 
     def transfer_cash(self, owner, cash):
-        owner.account.total_cash += cash
-        owner.account.cash += cash
+        owner.account.add_cash(cash)
         owner.report.cash_transferred(cash)
 
     class NotEnoughCashError(Exception):
