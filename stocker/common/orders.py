@@ -11,13 +11,15 @@ class Order(object):
         return self.company_id == other.company_id and self.amount == other.amount and self.limit_price == other.limit_price and self.expiration_date == other.expiration_date
 
     def __repr__(self):
-        return "%s: Company: %s, amount: %d,  limit price: %.2f, expiration date: %s" %\
+        return "%s: Company: %s, amount: %d,  limit price: %.2f, expiration date: %s, investor: %s, stockbroker: %s" %\
                (
                    self.__class__,
                    self.company_id,
                    self.amount,
                    self.limit_price,
-                   self.expiration_date
+                   self.expiration_date,
+                   self.investor,
+                   self.stockbroker
                    )
 
     def __getstate__(self):
@@ -26,6 +28,11 @@ class Order(object):
         del odict['investor']
         del odict['stockbroker']
         return odict
+
+    def __setstate__(self, dict):
+        self.__dict__.update(dict)
+        self.investor = None
+        self.stockbroker = None
 
 
 class OrderBuy(Order):
