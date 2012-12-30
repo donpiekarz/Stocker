@@ -96,7 +96,7 @@ class Stock(object):
             buy_list = self.companies[key]['buy']
             sell_list = self.companies[key]['sell']
 
-            sell_list.sort(key=lambda order: (order.limit_price, order.stockbroker))
+            sell_list.sort(key=lambda order: (order.limit_price, not order.stockbroker))
             buy_list.sort(key=lambda order: (order.limit_price, order.stockbroker), reverse=True)
 
             while len(buy_list) > 0 and len(sell_list) > 0:
@@ -111,12 +111,12 @@ class Stock(object):
                     if buy_order.stockbroker is None and sell_order.stockbroker is None:
                         buy_list.pop(0)
                         sell_list.pop(0)
-                    elif buy_order.stockbroker:
+                    if buy_order.stockbroker:
                         buy_list.pop(0)
-                    elif sell_order.stockbroker:
+                    if sell_order.stockbroker:
                         sell_list.pop(0)
 
-                    event_list.append(EventStockTransaction(1, buy_order, sell_order))
+                    event_list.append(EventStockTransaction(Clock.now(), buy_order, sell_order))
                 else:
                     break
 
@@ -127,7 +127,7 @@ class Stock(object):
             else:
                 if not event.buy_order.stockbroker is None:
                     event.buy_order.stockbroker.process(event)
-                if not event.sell_order.stockbroker is None:
+                elif not event.sell_order.stockbroker is None:
                     event.sell_order.stockbroker.process(event)
                     
             
