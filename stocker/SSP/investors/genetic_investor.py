@@ -1,6 +1,6 @@
 import collections
 
-from stocker.common.events import EventStockOpen, EventStockClose, EventStockTransaction
+from stocker.common.events import EventStockOpen, EventStockClose, EventStockTransaction, EventStockOrderNew
 from stocker.SSP.investors.base_investor import BaseInvestor
 
 from pyevolve import G1DList
@@ -240,9 +240,6 @@ class nonNanTrendFinder(object):
             if retry_counter == 10:
                 raise TrendFinderException("Couldn't find desired trend!")
             else:
-                print trendBeginning
-                print math.fabs(
-                    trendFinderfunctor.args[0][trendBeginning + 1] - trendFinderfunctor.args[0][trendBeginning])
                 trendBeginning = trendFinderfunctor.func(trendFinderfunctor.args[0],
                     math.fabs(
                         trendFinderfunctor.args[0][trendBeginning + 1] - trendFinderfunctor.args[0][trendBeginning]))
@@ -400,10 +397,10 @@ class tradingGA:
     def __init__(self, training_low_prices, training_high_prices, training_close_prices, training_volumes,
                  prediction_low_prices, prediction_high_prices, prediction_close_prices, prediction_volumes,
                  population_size=40, generations=50):
-        print "Low prices: ", len(training_low_prices)
-        print "High prices: ", len(training_high_prices)
-        print "Close prices: ", len(training_close_prices)
-        print "Volumes: ", len(training_volumes)
+        #print "Low prices: ", len(training_low_prices)
+        #print "High prices: ", len(training_high_prices)
+        #print "Close prices: ", len(training_close_prices)
+        #print "Volumes: ", len(training_volumes)
         self.training_low_prices = numpy.asarray(training_low_prices)
         self.training_high_prices = numpy.asarray(training_high_prices)
         self.training_close_prices = numpy.asarray(training_close_prices)
@@ -426,7 +423,7 @@ class tradingGA:
         #raw_input("Press ENTER to exit")
         # prepare indices
 
-        print "Preparing indices..."
+        #print "Preparing indices..."
 
         indicesContainer = IndicesContainer(self.training_low_prices, self.training_high_prices,
             self.training_close_prices, self.training_volumes)
@@ -435,17 +432,15 @@ class tradingGA:
 
         # prepare sell trend and buy trend vectors
 
-        print "Preparing sell trend and buy trend vectors..."
+        #print "Preparing sell trend and buy trend vectors..."
 
         #normalizedIndicesList = indices.indicesNormalizer().normalize(indicesContainer.getIndicesList())
         tradingGA.sellTrendBeginning, tradingGA.buyTrendBeginning = simpleTrendBeginningsFinder(
             self.training_close_prices, indicesList).findTrendBeginnings()
-        print tradingGA.sellTrendBeginning
-        print tradingGA.buyTrendBeginning
 
         # prepare individual
 
-        print "Preparing first individual..."
+        #print "Preparing first individual..."
 
         a = GAllele.GAlleleList(indicesList)
         setOfAlleles.add(a)
@@ -460,7 +455,7 @@ class tradingGA:
 
         # prepare engine
 
-        print "Preparing Genetic Algorithm engine..."
+        #print "Preparing Genetic Algorithm engine..."
 
         ga = GSimpleGA.GSimpleGA(genome)
         ga.setGenerations(self.generations)
@@ -471,15 +466,14 @@ class tradingGA:
         ga.selector.set(Selectors.GUniformSelector)
         ga.setPopulationSize(self.population_size)
 
-        print "Executing indices subset search..."
+        #print "Executing indices subset search..."
 
-        ga.evolve(freq_stats=1)
+        ga.evolve(freq_stats=0)
         best = ga.bestIndividual()
-        print best
 
-        print "Generating trading signal..."
+        #print "Generating trading signal..."
 
-        print "Preparing prediction set indices..."
+        #print "Preparing prediction set indices..."
 
         predictionIndicesContainer = IndicesContainer(self.prediction_low_prices, self.prediction_high_prices,
             self.prediction_close_prices, self.prediction_volumes)
@@ -488,7 +482,7 @@ class tradingGA:
 
         # prepare sell trend and buy trend vectors
 
-        print "Preparing prediction set sell trend and buy trend vectors..."
+        #print "Preparing prediction set sell trend and buy trend vectors..."
 
         sell = computeClusterCentre(best.getInternalList(), tradingGA.sellTrendBeginning)
         buy = computeClusterCentre(best.getInternalList(), tradingGA.buyTrendBeginning)
@@ -499,23 +493,25 @@ class tradingGA:
         d1 = numpy.linalg.norm(numpy.asarray(buy) - numpy.asarray(prediction))
         d2 = numpy.linalg.norm(numpy.asarray(sell) - numpy.asarray(prediction))
 
-        print "d1", d1
-        print "d2", d2
-
         if d1 < d2:
-            print "Time for Buyin'"
+            #print "Time for Buyin'"
+            return 1
         elif d1 > d2:
-            print "Time for Sellin'"
+            #print "Time for Sellin'"
+            return -1
+
+        return 0
 
 
 class GeneticInvestor(BaseInvestor):
     MAX_INT = 100000
 
     learning = 0
-    cash = 0
+    init_cash = 0
 
     companies = {}
     days = 0
+    decision = 0
 
     min_price_list = collections.defaultdict(list)
     max_price_list = collections.defaultdict(list)
@@ -529,6 +525,9 @@ class GeneticInvestor(BaseInvestor):
 
     ga = collections.defaultdict(lambda: None)
 
+    def prepare(self):
+        self.stockbroker.transfer_cash(self, self.init_cash)
+
     def process(self, event):
         #print event
         if isinstance(event, EventStockOpen):
@@ -538,22 +537,24 @@ class GeneticInvestor(BaseInvestor):
                 self.min_price[company] = GeneticInvestor.MAX_INT
                 self.max_price[company] = 0
                 if self.learning <= self.days:
+                    l = self.days / 2
                     self.ga[company] = tradingGA(
-                        self.min_price_list[company][:self.days], self.max_price_list[company][:self.days],
-                        self.last_price_list[company][:self.days], self.volume_list[company][:self.days],
-                        self.min_price_list[company][self.days:], self.max_price_list[company][self.days:],
-                        self.last_price_list[company][self.days:], self.volume_list[company][self.days:]
+                        self.min_price_list[company][:l], self.max_price_list[company][:l],
+                        self.last_price_list[company][:l], self.volume_list[company][:l],
+                        self.min_price_list[company][l:], self.max_price_list[company][l:],
+                        self.last_price_list[company][l:], self.volume_list[company][l:]
                     )
+                    self.decision = self.ga[company].generateDecision()
 
         elif isinstance(event, EventStockClose):
             self.days += 1
 
             for company in self.companies.keys():
                 if not self.last_price[company] is None:
-                    self.min_price_list[company].append(self.min_price[company])
-                    self.max_price_list[company].append(self.max_price[company])
-                    self.last_price_list[company].append(self.last_price[company])
-                    self.volume_list[company].append(self.volume[company])
+                    self.min_price_list[company].append(float(self.min_price[company]))
+                    self.max_price_list[company].append(float(self.max_price[company]))
+                    self.last_price_list[company].append(float(self.last_price[company]))
+                    self.volume_list[company].append(float(self.volume[company]))
 
         elif isinstance(event, EventStockTransaction):
             company = event.buy_order.company_id
@@ -563,8 +564,10 @@ class GeneticInvestor(BaseInvestor):
             self.last_price[company] = event.buy_order.limit_price
             self.max_price[company] = max(self.max_price[company], event.buy_order.limit_price)
             self.min_price[company] = min(self.min_price[company], event.buy_order.limit_price)
-            
-            
-                
-            
-        
+
+        elif isinstance(event, EventStockOrderNew):
+            if self.decision > 0:
+                self._buy(event.order)
+            elif self.decision < 0:
+                self._sell(event.order)
+
