@@ -5,12 +5,12 @@ from stocker.common.events import EventStockOrderNew, EventStockTransaction
 from stocker.common.orders import OrderBuy, OrderSell
 
 class RandomInvestor(BaseInvestor):
-    transfer_cash = 1000
+    init_cash = 1000
     buy_threshold = 0.5
     sell_threshold = 0.5
 
     def prepare(self):
-        self.stockbroker.transfer_cash(self, self.transfer_cash)
+        self.stockbroker.transfer_cash(self, self.init_cash)
 
     def process(self, event):
         if isinstance(event, EventStockOrderNew):
