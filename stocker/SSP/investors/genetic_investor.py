@@ -503,6 +503,15 @@ class tradingGA:
         return 0
 
 
+"""
+Sample XML
+<Investor module="stocker.SSP.investors.genetic_investor" class="GeneticInvestor">
+    <init_cash type="int">1000</init_cash>
+    <learning type="int">100</learning>
+    <report_path type="str">c:\code\stocker_data\inv1.stm</report_path>
+</Investor>
+"""
+
 class GeneticInvestor(BaseInvestor):
     MAX_INT = 100000
 
@@ -511,7 +520,6 @@ class GeneticInvestor(BaseInvestor):
 
     companies = {}
     days = 0
-    decision = 0
 
     min_price_list = collections.defaultdict(list)
     max_price_list = collections.defaultdict(list)
@@ -523,6 +531,7 @@ class GeneticInvestor(BaseInvestor):
     last_price = collections.defaultdict(lambda: None)
     volume = collections.defaultdict(lambda: 0)
 
+    decision = collections.defaultdict(lambda: 0)
     ga = collections.defaultdict(lambda: None)
 
     def prepare(self):
@@ -544,7 +553,7 @@ class GeneticInvestor(BaseInvestor):
                         self.min_price_list[company][l:], self.max_price_list[company][l:],
                         self.last_price_list[company][l:], self.volume_list[company][l:]
                     )
-                    self.decision = self.ga[company].generateDecision()
+                    self.decision[company] = self.ga[company].generateDecision()
 
         elif isinstance(event, EventStockClose):
             self.days += 1
@@ -566,8 +575,8 @@ class GeneticInvestor(BaseInvestor):
             self.min_price[company] = min(self.min_price[company], event.buy_order.limit_price)
 
         elif isinstance(event, EventStockOrderNew):
-            if self.decision > 0:
+            if self.decision[event.order.company_id] > 0:
                 self._buy(event.order)
-            elif self.decision < 0:
+            elif self.decision[event.order.company_id] < 0:
                 self._sell(event.order)
 
