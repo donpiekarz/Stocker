@@ -4,6 +4,16 @@ from stocker.SSP.investors.base_investor import BaseInvestor
 from stocker.common.events import EventStockOrderNew, EventStockTransaction
 from stocker.common.orders import OrderBuy, OrderSell
 
+"""
+Sample XML
+<Investor module="stocker.SSP.investors.random_investor" class="RandomInvestor">
+    <init_cash type="int">1000</init_cash>
+    <buy_threshold type="float">0.6</buy_threshold>
+    <sell_threshold type="float">0.6</sell_threshold>
+    <report_path type="str">c:\code\stocker_data\inv1.stm</report_path>
+</Investor>
+"""
+
 class RandomInvestor(BaseInvestor):
     init_cash = 1000
     buy_threshold = 0.5
