@@ -85,6 +85,9 @@ class BaseInvestor(object):
         self.account = Account()
         self.report = Null()
 
+    def __repr__(self):
+        return "Investor type: %s, args: %s" % (self.__class__.__name__, self.__dict__)
+
     def prepare(self):
         """Prepare investor for simulation"""
         pass

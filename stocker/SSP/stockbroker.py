@@ -29,6 +29,7 @@ class Stockbroker(object):
         print "================================================================================"
 
         for inv in self.investors:
+            print "%r" % inv
             inv.account.print_summary()
 
     def new_order(self, order, investor):
