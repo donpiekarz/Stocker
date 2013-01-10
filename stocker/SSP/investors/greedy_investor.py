@@ -45,4 +45,7 @@ class GreedyInvestor(BaseInvestor):
         company_id = event.buy_order.company_id
         self.shares[company_id] -= event.sell_order.amount
 
+        if self.shares[company_id] == 0:
+            self.price[company_id] = 0
+
 
