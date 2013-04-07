@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Stocker Report Visualizer"""
 
 from stocker.SRV.visualizer import Visualizer

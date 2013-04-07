@@ -1,4 +1,9 @@
 
+# build
+build/*
+dist/*
+MANIFEST
+
 # python
 *.pyc
 
@@ -8,5 +13,10 @@
 
 # PyCharm
 .idea
+
+# vim
+*~
+*.swp
+*.swo
 
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Stocker ETL Processor"""
 
 import os

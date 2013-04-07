@@ -1,5 +1,4 @@
-
-
+#!/usr/bin/env python
 """Stocker Stream Player"""
 
 import sys
