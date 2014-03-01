@@ -1,0 +1,3 @@
+
+class StupidInvestor( object ):
+    pass

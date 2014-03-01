@@ -1,0 +1,13 @@
+<Player>
+    <Stock>
+        <stream_path>C:\code\stocker_data\streams\amica_large.stm</stream_path>
+        <Stockbroker>
+            <provision>0.38</provision>
+            <Investor module="stocker.SSP.investors.genetic_investor" class="GeneticInvestor">
+                <init_cash type="int">1000</init_cash>
+                <report_path type="str">c:\code\stocker_data\inv1.stm</report_path>
+            </Investor>
+        </Stockbroker>
+    </Stock>
+
+</Player>
