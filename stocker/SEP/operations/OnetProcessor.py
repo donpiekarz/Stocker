@@ -3,9 +3,30 @@ import decimal
 import os
 import datetime
 
+from stocker.SEP.operations.BaseOperation import BaseOperation
 from stocker.common.events import EventStreamNew, EventStockOpen, EventStockClose
 from stocker.common.orders import OrderBuy, OrderSell
 from stocker.common.utils import Stream
+
+
+class OnetProcessor(BaseOperation):
+    enabled = True
+    tag = "onet-processor"
+    help_str = "transform csv files from Onet to streams"
+
+    @staticmethod
+    def register_parser(parser):
+        parser.add_argument("data_path", help="path original data")
+        parser.add_argument("output_stream_file", help="path to stream file")
+
+    @staticmethod
+    def main(options):
+        dirname_in = options.data_path
+        filename_out = options.output_stream_file
+
+        processor = Processor()
+        processor.build_stream(dirname_in, filename_out)
+
 
 class CompanyProcessor(object):
     def __init__(self, dirname, company_id):
