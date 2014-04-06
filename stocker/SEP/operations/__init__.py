@@ -13,7 +13,8 @@ def find_operations(path):
         module_name = ''.join([__name__, '.', module[1]])
         __import__(module_name)
 
-        is_subclass_of_base_operation = lambda c: inspect.isclass(c) and issubclass(c, BaseOperation)
+        is_subclass_of_base_operation = lambda c: inspect.isclass(c) and issubclass(c,
+                                                                                    BaseOperation) and c is not BaseOperation
         for _, cls in inspect.getmembers(sys.modules[module_name], is_subclass_of_base_operation):
             all_operations.add(cls)
             is_enabled = getattr(cls, 'enabled', False)
