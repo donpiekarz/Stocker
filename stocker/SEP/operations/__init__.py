@@ -1,12 +1,12 @@
-
 import inspect
 import pkgutil
 import sys
 
 from stocker.SEP.operations.BaseOperation import BaseOperation
 
+
 def find_operations(path):
-    available_operations = set()
+    available_operations = {}
     all_operations = set()
 
     for module in pkgutil.iter_modules(path):
@@ -18,9 +18,15 @@ def find_operations(path):
             all_operations.add(cls)
             is_enabled = getattr(cls, 'enabled', False)
             if is_enabled:
-                available_operations.add(cls)
+                tag = getattr(cls, 'tag', None)
+                help_str = getattr(cls, 'help_str', None)
+                assert tag is not None, "missing tag (please override)"
+                assert help_str is not None, "missing help_str (please override)"
+
+                available_operations[tag] = cls
 
     return available_operations, all_operations
+
 
 available_operations, all_operations = find_operations(__path__)
 
