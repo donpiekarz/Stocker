@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 __desc__ = """Stocker Report Visualizer"""
 __additional_help__ = """Visualizes results of Stocker simulation"""
 
@@ -19,7 +19,7 @@ def add_command_line_params(parser):
 
 @basic_program_structure.run_function()
 def main(options):
-    Visualizer.main(stream_file, data_visualizer)
+    Visualizer.main(options.stream_file, options.data_visualizer)
 
 if __name__ == "__main__":
     main()
