@@ -17,31 +17,35 @@ Sample XML
 class MeanReversionInvestor(BaseInvestor):
     init_cash = 1000
     buy_threshold = 0.5
-    buy_mean_deviation = 0.05
-    sell_mean_deviation = 0.05
-    mean = 0.0
-    flag = False
+    buy_mean_deviation = decimal.Decimal(-0.006)
+    sell_mean_deviation = decimal.Decimal(0.004)
+    mean = None
+    history_price = []
+    history_amount = []
+    size = 100
 
     def prepare(self):
         self.stockbroker.transfer_cash(self, self.init_cash)
 
     def _process_order_buy(self, event):
-        if self.flag == False:
+        if self.mean is not None and self.mean + self.mean * self.buy_mean_deviation > event.order.limit_price:
             self._buy(event.order)
-            self.flag = True
-        pass
 
     def _process_order_sell(self, event):
-        company_id = event.order.company_id
-        #self._sell(event.order)
+        #print self.count, self.mean
+        if self.mean is not None and self.mean + self.mean * self.sell_mean_deviation < event.order.limit_price:
+            self._sell(event.order)
 
     def _process_bought(self, event):
         company_id = event.buy_order.company_id
-        print "kupilem!!!!!!!!!"
 
     def _process_sold(self, event):
         pass
 
     def _process_transaction(self, event):
-        pass
-
+        self.history_price.append(event.buy_order.limit_price * event.buy_order.amount)
+        self.history_amount.append(event.buy_order.amount)
+        if len(self.history_price) >= self.size:
+            self.history_price.pop(0)
+            self.history_amount.pop(0)
+            self.mean = decimal.Decimal(sum(self.history_price) / sum(self.history_amount))
