@@ -39,7 +39,7 @@ class VolumePricePlotter(BasePlotter):
             self.__process_order_realized(event)
 
     def draw_plot(self, fig):
-        i = 0
+        i = 1
         size = len(self.companies.keys())
         for company in self.companies.keys():
             ax = fig.add_subplot(size, 1, i)
