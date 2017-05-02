@@ -9,6 +9,7 @@ from stocker.common.utils import Null
 
 class Account(object):
     def __init__(self):
+        self._transactions = 0
         self._total_cash = 0
         self._cash = 0
         self._cash_blocked = 0
@@ -31,11 +32,17 @@ class Account(object):
     def shares_blocked( self ):
         return self._shares_blocked
 
+    @property
+    def transactions(self):
+        return self._transactions
+
     def add_cash(self, cash):
         self._total_cash += cash
         self._cash += cash
 
     def bought(self, order):
+        self._transactions += 1
+
         value = order.amount * order.limit_price
 
         self._cash_blocked -= value
@@ -44,6 +51,8 @@ class Account(object):
         assert self._cash_blocked >= 0, "Cash blocked is less then zero!"
 
     def sold(self, order):
+        self._transactions += 1
+
         value = order.amount * order.limit_price
 
         self._cash += value
@@ -67,6 +76,7 @@ class Account(object):
 
     def print_summary(self):
         print "Account summary:"
+        print "Placed orders: %d" % self._transactions
         print "Total transfered cash: %.2f" % self._total_cash
         print "Current cash: %.2f" % self._cash
         print "Cash blocked: %.2f" % self._cash_blocked
